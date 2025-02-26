@@ -1,73 +1,81 @@
-import Link from 'next/link';
-import SearchBarShopping from '../ui/SearchBarShopping';
-import { PiShoppingCartSimpleLight, PiHeartFill } from 'react-icons/pi';
-import { GoPerson } from 'react-icons/go';
-import * as motion from 'motion/react-client';
+import Link from "next/link";
+import SearchBarShopping from "../ui/SearchBarShopping";
+import { PiHeartFill } from "react-icons/pi";
+import { GoPerson } from "react-icons/go";
+import * as motion from "motion/react-client";
+import CartButton from "../ui/CartButton";
 
-
-export default function NavberUser() {
-
+export default function NavbarUser() {
   const animation = {
-    whileHover: { scale: 1.1}, // ขยายขึ้นเมื่อ hover
-    transition: { duration: 0.3 }, // ทำให้ animation smooth
+    whileHover: { scale: 1.1 },
+    transition: { duration: 0.3 },
   };
 
-  const menuItems: string[] = ["NEW", "MEN", "WOMEN", "KIDS"];
-  
-  const actionItems = [
-    { id: "contract", label: "Contract us", type: "link" },
-    { id: "person", icon: <GoPerson className="h-6 w-6" />, type: "icon" },
-    { id: "heart", icon: <PiHeartFill className="h-6 w-6" />, type: "icon" },
-    { id: "cart", icon: <PiShoppingCartSimpleLight className="h-6 w-6" />, type: "button" },
+  // ✅ แก้ไขชื่อ interface เป็น `MenuItem`
+  interface MenuItem {
+    id: number;
+    label: string; // ✅ แก้ `lable` เป็น `label`
+    route: string;
+  }
+
+  const menuItems: MenuItem[] = [
+    { id: 1, label: "NEW", route: "#" },
+    { id: 2, label: "MEN", route: "#" },
+    { id: 3, label: "WOMEN", route: "#" },
+    { id: 4, label: "KIDS", route: "#" },
   ];
 
-  const linkClass = "rounded-2xl p-2 hover:bg-gray-200 transition-all duration-300 hover:text-amber-600";
+  // ✅ แก้ไข Type ของ `actionItems`
+  interface ActionItem {
+    id: string;
+    label?: string;
+    icon?: JSX.Element;
+    type: "link" | "button";
+    route: string;
+  }
+
+  const actionItems: ActionItem[] = [
+    { id: "contract", label: "Contact us", type: "link", route: "#" },
+    { id: "person", icon: <GoPerson className="h-6 w-6" />, type: "link", route: "#" },
+    { id: "heart", icon: <PiHeartFill className="h-6 w-6" />, type: "link", route: "#" },
+  ];
+
+  const linkClass =
+    "rounded-2xl p-2 whitespace-nowrap flex justify-center hover:bg-gray-200 transition-all duration-300 hover:text-amber-600";
 
   return (
-    <>
-      <nav className="flex flex-row items-center justify-evenly bg-gray-100 p-5 pl-16">
-        <img
-          src="/images/next-step-logo.svg"
-          width="120"
-          height="120"
-          className=""
-          alt="Next Step Logo"
-        />
-        <article className="flex flex-row justify-start space-x-10 pl-24">
-          {menuItems.map((item) => (
-            <motion.div 
-              key={item}
-              {...animation}
-              className={linkClass} >
-            
-            <Link href="#">{item}</Link>
-            </motion.div>
-         ))}
-        </article>
-        <section className="pb-5">
-          <SearchBarShopping />
-        </section>
-        <figure className="flex flex-row items-center space-x-10">
+    <nav className="hidden sm:hidden lg:flex lg:flex-row cursor-pointer lg:items-center lg:justify-between lg:bg-gray-100 lg:px-16 lg:py-3">
+      <img src="/images/next-step-logo.svg" width="120" height="120" alt="Next Step Logo" />
 
-  {actionItems.map((item) => (
-    <motion.div
-      key={item.id}
-      {...animation}
-      className={linkClass}
-    >
-      {item.type === "link" ? (
-        <Link href="#">{item.label}</Link>
-      ) : item.type === "button" ? (
-        <button>{item.icon}</button>
-      ) : (
-        item.icon
-      )}
-    </motion.div>
-  ))}
+      {/* ✅ แสดงเฉพาะ Label ของเมนู */}
+      <article className="flex flex-row justify-start space-x-10 pl-24">
+        {menuItems.map((item) => (
+          <motion.div key={item.id} {...animation} className={linkClass}>
+            {item.label} {/* ✅ ใช้ item.label แทน JSX */}
+          </motion.div>
+        ))}
+      </article>
 
+      <section className="pb-5">
+        <SearchBarShopping />
+      </section>
 
-        </figure>
-      </nav>
-    </>
+      {/* ✅ แสดงไอคอน & Action Menu */}
+      <figure className="flex flex-row items-center space-x-10 justify-end px-5 pr-10">
+        {actionItems.map((item) => (
+          <motion.div key={item.id} {...animation} className={linkClass}>
+            {item.type === "link" ? (
+              <Link href={item.route}>{item.label || item.icon}</Link>
+            ) : item.type === "button" ? (
+              <button>{item.icon}</button>
+            ) : (
+              item.icon
+            )}
+          </motion.div>
+        ))}
+
+       <CartButton/>
+      </figure>
+    </nav>
   );
 }
