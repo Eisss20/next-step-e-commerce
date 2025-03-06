@@ -49,7 +49,7 @@ export default function MobileSidebar({ isOpen, toggleSidebar, className }: Mobi
       <div
         className={`fixed top-0 right-0 h-full w-72 transform bg-white shadow-lg dark:bg-gray-700 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
-        } z-10 transition-transform duration-300 ease-in-out`}
+        } z-40 transition-transform duration-300 ease-in-out`}
       >
         {/* เมนูภายใน Sidebar */}
         <nav className="mt-12 flex flex-col space-y-4 p-6">

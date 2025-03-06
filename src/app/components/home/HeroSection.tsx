@@ -1,38 +1,25 @@
-import Image from "next/image";
+import ButtonMain from "../ui/ButtonMain";
+import CardItem from "../ui/CardItemFlashSale";
 
 
 export default function HeroSection() {
   return (
-    <div className="relative w-full h-screen flex overflow-hidden">
-
-      {/* รูปสำหรับ Mobile */}
-      <div className="absolute inset-0 lg:hidden">
-        <Image
-          src="/images/home-imgaes/main_mobile.avif"
-          alt="Sneaker"
-          quality={100}
-          fill
-          className="object-cover"
-        />
-      </div>
-
-      {/* รูปสำหรับ Desktop */}
-      <Image
-        src="/images/home-imgaes/mainsneaker.png"
-        alt="Sneaker"
-        width={1920}
-        height={1080}
-        quality={100}
-        className="lg:block hidden w-full h-full object-cover"
-      />
-
-
-      <article className="absolute  justify-start pl-5 py-30 w-full h-full flex flex-col space-y-2 ">
+    <section 
+      className=" w-full h-svh flex flex-col justify-center bg-contain   items-start  bg-no-repeat 
+      lg:bg-[url('/images/home-imgaes/mainsneaker.png')] 
+      bg-[url('/images/home-imgaes/main_mobile.avif')]"
+    >
+      {/* Content */}
+      <article className="pl-5 py-30 w-full h-full space-y-3">
         <h1 className="text-black drop-shadow-xl text-4xl font-bold">Step-up Your Stride</h1>
-        <p className="text-black text-xl"> Premium Athletic Footwear </p>
+        <p className="text-black text-xl">Premium Athletic Footwear</p>
+        <ButtonMain type="primary">SHOW NOW</ButtonMain>
       </article>
-      
 
-    </div>
+      <section className="w-full flex flex-row-reverse space-x-5  pb-52 pr-3.5 z-10  ">
+        <CardItem />
+      </section>
+      
+    </section>
   );
 }
