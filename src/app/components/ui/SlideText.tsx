@@ -22,7 +22,7 @@ export default function SlideText() {
 
   return (
     <>
-      <div className="hidden bg-black p-2 text-center font-semibold text-white lg:block">
+      <div className="hidden bg-black p-2 text-center font-semibold text-white lg:block ">
         <AnimatePresence mode="wait">
           <motion.h2
             key={currentText}
