@@ -3,6 +3,11 @@
 import { useState, useEffect } from "react";
 import { PiShoppingCartSimpleLight } from "react-icons/pi";
 
+
+
+// ทำ context api สำหรับการจัดการสินค้าในตะกร้า
+// ทำการเพิ่มสินค้าลงในตะกร้า 
+
 export default function CartButton() {
   interface CartItem {
     id: number;
@@ -14,7 +19,7 @@ export default function CartButton() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  // ✅ ใช้ `useEffect()` โหลด cartItems เพื่อแก้ Hydration
+
   useEffect(() => {
     setCartItems([
       { id: 1, name: "Nike Air Max", price: 120, image: "/images/shoes1.jpg" },

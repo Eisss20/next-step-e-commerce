@@ -3,7 +3,7 @@ import SearchBarShopping from "../ui/SearchBarShopping";
 import { PiHeartFill } from "react-icons/pi";
 import { GoPerson } from "react-icons/go";
 import * as motion from "motion/react-client";
-import CartButton from "../ui/CartButton";
+import CartButton from "../cart/CartButton";
 import { Slide } from "@mui/material";
 import SlideText from "../ui/SlideText";
 
@@ -46,9 +46,9 @@ export default function NavbarUser() {
     "rounded-2xl p-2 whitespace-nowrap flex justify-center hover:bg-gray-200 transition-all duration-300 hover:text-amber-600 font-medium";
 
   return (
-    <> 
+    <>  
      <SlideText/> 
-    <nav className="relative hidden sm:hidden lg:flex lg:flex-row cursor-pointer lg:items-center lg:justify-between lg:bg-gray-100 lg:px-16 lg:py-3 z-40">
+    <nav className="relative hidden sm:hidden lg:flex lg:flex-row cursor-pointer lg:items-center lg:justify-between lg:bg-gray-100 lg:px-16 lg:py-3 z-40   ">
     <img src="/images/next-step-logo.svg" width="120" height="120" alt="Next Step Logo" />
 
     <article className="flex flex-row justify-start space-x-10 pl-24">
