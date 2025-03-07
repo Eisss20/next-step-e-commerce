@@ -43,7 +43,7 @@ export default function NavbarUser() {
   ];
 
   const linkClass =
-    "rounded-2xl p-2 whitespace-nowrap flex justify-center hover:bg-gray-200 transition-all duration-300 hover:text-amber-600 font-medium";
+    "rounded-2xl p-2 whitespace-nowrap flex justify-center hover:bg-gray-200 transition-all duration-300 hover:text-amber-600 font-medium overflow-x-hidden";
 
   return (
     <>  
