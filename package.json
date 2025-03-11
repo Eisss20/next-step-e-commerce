@@ -19,6 +19,7 @@
     "@mui/material": "^6.4.5",
     "@prisma/client": "^6.4.1",
     "@supabase/supabase-js": "^2.48.1",
+    "lucide-react": "^0.479.0",
     "motion": "^12.4.7",
     "next": "15.1.6",
     "pg": "^8.13.1",
