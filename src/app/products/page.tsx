@@ -1,15 +1,21 @@
-import Sidebar from "./components/Sidebar";
-import type { ProductType } from "@/types/types";
-import ProductGrid from "./components/ProductGrid";
+'use client'; // Add this directive at the top
+
+import { useState } from 'react';
+import { ProductType } from '@/types/types';
+import Sidebar from './components/Sidebar';
+import ProductGrid from './components/ProductGrid';
 
 export default function ProductsPage() {
-  // This would typically come from an API or database
+  // State for price range filter
+  const [priceRange, setPriceRange] = useState([0, 300]);
+
+  // Sample product data
   const products: ProductType[] = [
     {
       id: 1,
       name: 'Explorer Sneaker',
       price: 129,
-      image: '/placeholder.svg?height=400&width=400',
+      image: '/products-images/shoe-1.2.avif',
       isBestSeller: false,
       category: 'Performance Series',
     },
@@ -17,7 +23,7 @@ export default function ProductsPage() {
       id: 2,
       name: 'Urban Walker',
       price: 149,
-      image: '/placeholder.svg?height=400&width=400',
+      image: '/products-images/shoe-1.avif',
       isBestSeller: false,
       category: 'Limited Edition',
     },
@@ -25,7 +31,7 @@ export default function ProductsPage() {
       id: 3,
       name: 'Terrain Explorer',
       price: 159,
-      image: '/placeholder.svg?height=400&width=400',
+      image: '/products-images/shoe-2.1.avif',
       isBestSeller: true,
       category: 'Best Sellers',
     },
@@ -33,15 +39,40 @@ export default function ProductsPage() {
       id: 4,
       name: 'City Runner',
       price: 139,
-      image: '/placeholder.svg?height=400&width=400',
+      image: '/products-images/shoe-2.1.avif',
       isBestSeller: false,
       category: 'Performance Series',
     },
-    // Additional products would be added here
+    {
+      id: 5,
+      name: 'City Runner',
+      price: 139,
+      image: '/products-images/shoe-2.1.avif',
+      isBestSeller: false,
+      category: 'Performance Series',
+    },
+    {
+      id: 6,
+      name: 'City Runner',
+      price: 139,
+      image: '/products-images/shoe-2.1.avif',
+      isBestSeller: false,
+      category: 'Performance Series',
+    },
   ];
 
+  // Handle price range change
+  const handlePriceChange = (value: number[]) => {
+    setPriceRange(value);
+  };
+
+  // Filter products by the selected price range
+  const filteredProducts = products.filter(
+    (product) => product.price >= priceRange[0] && product.price <= priceRange[1]
+  );
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="mx-auto px-4 sm:px-20 py-12">
       <nav className="mb-4 flex text-sm">
         <a href="/" className="text-gray-500 hover:text-gray-700">
           Home
@@ -52,9 +83,11 @@ export default function ProductsPage() {
 
       <h1 className="mb-8 text-3xl font-bold">All Products</h1>
 
-      <div className="flex flex-col gap-8 md:flex-row">
-        <Sidebar />
-        <ProductGrid products={products} />
+      <div className="flex flex-col gap-10 md:flex-row">
+        {/* Pass price range and filter change function to Sidebar */}
+        <Sidebar priceRange={priceRange} onPriceChange={handlePriceChange} />
+        {/* Pass the filtered products to ProductGrid */}
+        <ProductGrid products={filteredProducts} />
       </div>
     </div>
   );
