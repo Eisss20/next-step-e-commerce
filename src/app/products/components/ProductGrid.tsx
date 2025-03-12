@@ -13,7 +13,14 @@ export default function ProductGrid({ products }: ProductGridProps) {
   const [sortOption, setSortOption] = useState('Recommended');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const sortOptions = ['Recommended', 'Price: Low to High', 'Price: High to Low', 'Newest'];
+  const sortOptions = [
+    'Recommended',
+    'Newest',
+    'Price (low to high)',
+    'Price (high to low)',
+    'Name A-Z',
+    'Name Z-A',
+  ];
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -24,24 +31,37 @@ export default function ProductGrid({ products }: ProductGridProps) {
     setIsDropdownOpen(false);
   };
 
+  // Sorting logic
+  const sortedProducts = [...products]; // Create a copy of the products array
+
+  if (sortOption === 'Price (low to high)') {
+    sortedProducts.sort((a, b) => a.price - b.price);
+  } else if (sortOption === 'Price (high to low)') {
+    sortedProducts.sort((a, b) => b.price - a.price);
+  } else if (sortOption === 'Name A-Z') {
+    sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sortOption === 'Name Z-A') {
+    sortedProducts.sort((a, b) => b.name.localeCompare(a.name));
+  } else if (sortOption === 'Newest') {
+    // Assuming `newest` could be determined by an `id` or `createdAt` field
+    sortedProducts.sort((a, b) => b.id - a.id); // or any other method to determine newness
+  }
+
   return (
     <div className="flex-1">
       <div className="mb-6 flex items-center justify-between">
-        <span className="text-sm text-gray-500">{products.length} products</span>
+        <span className="text-sm text-gray-800">{sortedProducts.length} products</span>
         <div className="relative">
-          <button
-            className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
-            onClick={toggleDropdown}
-          >
+          <button className="flex items-center gap-2 px-3 py-2 text-sm" onClick={toggleDropdown}>
             <span>Sort by: {sortOption}</span>
             <ChevronDown
-              size={16}
+              size={18}
               className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
             />
           </button>
 
           {isDropdownOpen && (
-            <div className="absolute right-0 z-10 mt-1 w-48 rounded-md border bg-white shadow-lg">
+            <div className="absolute right-0 z-10 mt-1 w-56 rounded-sm border bg-white shadow-lg">
               {sortOptions.map((option) => (
                 <button
                   key={option}
@@ -57,7 +77,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {products.map((product) => (
+        {sortedProducts.map((product) => (
           <div key={product.id} className="group relative">
             <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
               {product.isBestSeller && (
