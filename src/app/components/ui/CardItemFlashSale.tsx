@@ -4,7 +4,7 @@ import ButtonMain from "./ButtonMain";
 
 // เหลือวาง Logic  วนลูปแสดงข้อมูลสินค้าที่มีในระบบ
 
-export default function CardItem() {
+export default function CardItemFlashSale() {
     return (
       
     <motion.div
