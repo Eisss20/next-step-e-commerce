@@ -1,5 +1,6 @@
 import ButtonMain from "../ui/ButtonMain";
-import CardItem from "../ui/CardItemFlashSale";
+import CardItemFlashSale from "../ui/CardItemFlashSale";
+
 
 export default function HeroSection() {
   return (
@@ -21,7 +22,7 @@ export default function HeroSection() {
 
         {/* Card Item */}
         <section className="w-full flex flex-row-reverse pt-[18rem]  z-10 lg:pr-20">
-          <CardItem />
+          <CardItemFlashSale />
         </section>
       </section>
     </main>

@@ -3,9 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavbarUser from "./components/commons/NavbarUser";
 import UserSidebar from "./components/commons/UserSidebar";
-
-
-
+import { GiConverseShoe } from "react-icons/gi";
 
 
 const geistSans = Geist({
@@ -30,6 +28,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+<head>
+<link rel="icon" type="image/png" href="/running.png" />
+</head>
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
