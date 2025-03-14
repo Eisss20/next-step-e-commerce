@@ -21,6 +21,16 @@ export default function Sidebar({ priceRange, onPriceChange }: SidebarProps) {
 
   return (
     <aside className="w-full shrink-0 md:w-64">
+      <nav className="mb-4 flex text-sm">
+        <a href="/" className="text-gray-500 hover:text-gray-700">
+          Home
+        </a>
+        <span className="mx-2 text-gray-400">&gt;</span>
+        <span className="text-gray-700">All Products</span>
+      </nav>
+
+      <h1 className="mb-8 text-3xl font-bold">All Products</h1>
+
       <div className="mb-8">
         <h2 className="mb-4 text-lg font-medium">Browse by</h2>
         <ul className="space-y-2">

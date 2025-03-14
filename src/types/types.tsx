@@ -4,6 +4,5 @@ export type ProductType = {
   name: string;
   price: number;
   image: string;
-  isBestSeller: boolean;
-  category: string;
+  category: Array<string>;
 };
