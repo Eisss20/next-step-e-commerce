@@ -48,7 +48,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
   }
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 pt-10">
       <div className="mb-6 flex items-center justify-between">
         <span className="text-sm text-gray-800">{sortedProducts.length} products</span>
         <div className="relative">
@@ -79,12 +79,19 @@ export default function ProductGrid({ products }: ProductGridProps) {
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {sortedProducts.map((product) => (
           <div key={product.id} className="group relative">
-            <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
-              {product.isBestSeller && (
+            <div className="relative aspect-[8/9] overflow-hidden rounded-lg bg-gray-100">
+              {/* ป้าย Sale และ Best Seller */}
+              {product.category?.includes('Best Sellers') && (
                 <div className="absolute top-2 left-2 z-10 rounded bg-yellow-400 px-2 py-1 text-xs font-semibold">
                   BEST SELLER
                 </div>
               )}
+              {product.category?.includes('Sale') && (
+                <div className="absolute top-2 left-2 z-10 rounded bg-yellow-400 px-2 py-1 text-xs font-semibold">
+                  SALE
+                </div>
+              )}
+
               <Image
                 src={product.image || '/placeholder.svg'}
                 alt={product.name}

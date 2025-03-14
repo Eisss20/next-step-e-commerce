@@ -16,48 +16,63 @@ export default function ProductsPage() {
       name: 'Explorer Sneaker',
       price: 129,
       image: '/products-images/shoe-1.2.avif',
-      isBestSeller: false,
-      category: 'Performance Series',
+      category: ['Performance Series'],
     },
     {
       id: 2,
       name: 'Urban Walker',
       price: 149,
       image: '/products-images/shoe-1.avif',
-      isBestSeller: false,
-      category: 'Limited Edition',
+      category: ['Limited Edition', 'Sale'],
     },
     {
       id: 3,
       name: 'Terrain Explorer',
       price: 159,
       image: '/products-images/shoe-2.1.avif',
-      isBestSeller: true,
-      category: 'Best Sellers',
+      category: ['Best Sellers'],
     },
     {
       id: 4,
       name: 'City Runner',
       price: 139,
-      image: '/products-images/shoe-2.1.avif',
-      isBestSeller: false,
-      category: 'Performance Series',
+      image: '/products-images/shoe-2.2.avif',
+      category: ['Performance Series'],
     },
     {
       id: 5,
       name: 'City Runner',
-      price: 139,
-      image: '/products-images/shoe-2.1.avif',
-      isBestSeller: false,
-      category: 'Performance Series',
+      price: 159,
+      image: '/products-images/shoe-3.1.avif',
+      category: ['Performance Series'],
     },
     {
       id: 6,
       name: 'City Runner',
-      price: 139,
-      image: '/products-images/shoe-2.1.avif',
-      isBestSeller: false,
-      category: 'Performance Series',
+      price: 169,
+      image: '/products-images/shoe-3.2.avif',
+      category: ['Performance Series'],
+    },
+    {
+      id: 7,
+      name: 'City Runner',
+      price: 179,
+      image: '/products-images/shoe-4.1.avif',
+      category: ['Performance Series'],
+    },
+    {
+      id: 8,
+      name: 'City Runner',
+      price: 189,
+      image: '/products-images/shoe-4.2.avif',
+      category: ['Performance Series', 'Best Sellers'],
+    },
+    {
+      id: 8,
+      name: 'City Runner',
+      price: 109,
+      image: '/products-images/shoe-1.avif',
+      category: ['Performance Series','Sale'],
     },
   ];
 
@@ -72,17 +87,7 @@ export default function ProductsPage() {
   );
 
   return (
-    <div className="mx-auto px-4 sm:px-20 py-12">
-      <nav className="mb-4 flex text-sm">
-        <a href="/" className="text-gray-500 hover:text-gray-700">
-          Home
-        </a>
-        <span className="mx-2 text-gray-400">&gt;</span>
-        <span className="text-gray-700">All Products</span>
-      </nav>
-
-      <h1 className="mb-8 text-3xl font-bold">All Products</h1>
-
+    <div className="mx-auto py-12 sm:px-20">
       <div className="flex flex-col gap-10 md:flex-row">
         {/* Pass price range and filter change function to Sidebar */}
         <Sidebar priceRange={priceRange} onPriceChange={handlePriceChange} />
