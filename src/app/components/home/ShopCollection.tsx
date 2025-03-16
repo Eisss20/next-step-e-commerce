@@ -1,7 +1,7 @@
 import ButtonMain from "../ui/ButtonMain";
 import CardBestSeller from "../products/CardBestSeller";
 
-export default function BestSellersSection() {
+export default function ShopCollection() {
   
   
   return (

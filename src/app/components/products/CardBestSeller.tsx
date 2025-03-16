@@ -48,7 +48,7 @@ export default function CardBestSeller() {
     
     return (
       
-    <section className="container h-full w-full mt-10 mx-auto">           
+    <section className="container h-full w-full  mt-10 mx-auto">           
     <div className="offset-0 relative">
     <div className="mt-10 lg:flex lg:flex-row lg:space-x-5">
       {productSellers.map((product, index) => (

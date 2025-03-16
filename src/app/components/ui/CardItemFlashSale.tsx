@@ -11,7 +11,7 @@ export default function CardItemFlashSale() {
       initial={{ opacity: 0, y: 20 }} 
       animate={{ opacity: 1, y: 0 }} 
       transition={{ duration: 1, ease: "easeOut" }} 
-      className="w-60 h-64 bg-white/30 backdrop-blur-xl rounded-lg shadow-lg overflow-hidden z-50 lg:w-[35rem] lg:h-[18.5rem] lg:flex lg:flex-row "
+      className="w-60 h-64 bg-white/30 backdrop-blur-xl rounded-lg shadow-lg overflow-hidden  lg:w-[35rem] lg:h-[18.5rem] lg:flex lg:flex-row "
       >
       <figure className="flex flex-col items-center space-y-5 justify-center pt-10   lg:justify-normal lg:p-5  "> 
 
