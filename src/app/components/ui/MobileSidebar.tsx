@@ -11,7 +11,7 @@ export default function MobileSidebar({ isOpen, toggleSidebar, className }: Mobi
     <>
       {/* Hamburger Button */}
       <button
-        className="fixed top-4 right-4 z-50 p-2 transition-transform duration-200 active:scale-90 lg:hidden"
+        className="fixed top-4 right-4 z-100 p-2 transition-transform duration-200 active:scale-90 lg:hidden"
         onClick={toggleSidebar}
       >
         <div className="relative h-8 w-8">
