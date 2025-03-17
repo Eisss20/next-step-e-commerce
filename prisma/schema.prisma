@@ -29,7 +29,7 @@ model product {
   color_name     String  @db.VarChar(100)
   price_per_unit Decimal @db.Decimal(10, 2)
   net_price      Decimal @db.Decimal(10, 2)
-  discount_price Decimal @db.Decimal(10, 2)
+  discount_price Decimal? @db.Decimal(10, 2)  
   description    String
   category_id    Int
   head_detail    String
