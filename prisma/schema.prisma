@@ -61,7 +61,10 @@ model product_image {
   product_image_id  Int     @id @default(autoincrement())
   product_id        String  @map("product_id")
   product_image_url String
+  position_image    Int?
   product           product @relation(fields: [product_id], references: [product_id])
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
 }
 
 model size_stock {
@@ -81,3 +84,102 @@ model product_stock {
   product          product    @relation(fields: [product_id], references: [product_id])
   size_stock       size_stock @relation(fields: [size_stock_id], references: [size_stock_id])
 }
+
+
+// -------------------------------------------------------- user section --------------------------------------------------------------------------
+
+model user {
+user_id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+username String @unique
+password String
+email String @unique
+created_at DateTime @default(now())
+updated_at DateTime @updatedAt
+user_profiles user_profile[]
+}
+
+
+model user_profile {
+  user_profile_id Int @id @default(autoincrement())
+  user_id String @db.Uuid
+  first_name    String
+  last_name     String
+  phone_number  String
+  address_id    Int
+  age          Int
+  gender       String
+  date_of_birth DateTime
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user user @relation(fields: [user_id], references: [user_id])
+  address address @relation(fields: [address_id], references: [address_id])
+}
+
+
+model address {
+  address_id Int @id @default(autoincrement())
+  detail_address String
+  location_id Int
+  city_id Int
+  province_state_id Int
+  zipcode_id Int
+  telephone_number String @db.VarChar(15)
+
+  city city @relation(fields: [city_id], references: [city_id])
+  province_state province_state @relation(fields: [province_state_id], references: [province_state_id])
+  zipcode zipcode @relation(fields: [zipcode_id], references: [zipcode_id])   
+  user_profiles user_profile[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model location {
+  location_id Int @id @default(autoincrement())
+  location_name String @unique
+  province_states province_state[]
+}
+
+model province_state {
+  province_state_id Int @id @default(autoincrement())
+  province_state_name String @unique
+  location_id Int
+  type String @db.VarChar(10)
+  location location @relation(fields: [location_id], references: [location_id])
+  cities city[]
+  addresses address[]
+}
+
+model city {
+  city_id Int @id @default(autoincrement())
+  province_state_id Int 
+  city_name String @unique
+  province_state province_state @relation(fields: [province_state_id], references: [province_state_id])
+  zipcodes zipcode[]
+  addresses address[]
+}
+
+model zipcode {
+  zipcode_id Int @id @default(autoincrement())
+  zipcode String @unique @db.VarChar(10)
+  city_id Int
+  city city @relation(fields: [city_id], references: [city_id])
+  addresses address[]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
