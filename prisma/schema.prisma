@@ -23,22 +23,21 @@ model post_test {
   createdAt DateTime @default(now())
 }
 
-
 model product {
-  product_id   String @id @unique @db.VarChar(20)
-  product_name   String @db.VarChar(50)
+  product_id     String  @id @unique @default("") @db.VarChar(30)
+  product_name   String  @db.VarChar(50)
   color_name     String  @db.VarChar(100)
-  price_per_unit Decimal @db.Decimal(10,2)
-  net_price      Decimal @db.Decimal(10,2)
-  discount_price Decimal @db.Decimal(10,2)
+  price_per_unit Decimal @db.Decimal(10, 2)
+  net_price      Decimal @db.Decimal(10, 2)
+  discount_price Decimal @db.Decimal(10, 2)
   description    String
   category_id    Int
   head_detail    String
   detail_product String
   tag_id         Int
 
-  tag            tag     @relation(fields: [tag_id], references: [tag_id])
-  category       category     @relation(fields: [category_id], references: [category_id])
+  tag            tag             @relation(fields: [tag_id], references: [tag_id])
+  category       category        @relation(fields: [category_id], references: [category_id])
   product_images product_image[]
   size_stocks    size_stock[]
   product_stocks product_stock[]
@@ -52,34 +51,33 @@ model tag {
 }
 
 model category {
-  category_id Int @id @default(autoincrement())
+  category_id   Int    @id @default(autoincrement())
   category_name String @unique
 
   products product[]
 }
 
 model product_image {
-  product_image_id Int @id @default(autoincrement())
-  product_id String @map("product_id")
+  product_image_id  Int     @id @default(autoincrement())
+  product_id        String  @map("product_id")
   product_image_url String
-  product       product @relation(fields: [product_id], references: [product_id])
+  product           product @relation(fields: [product_id], references: [product_id])
 }
 
-
 model size_stock {
-  size_stock_id Int @id @default(autoincrement())
-  product_id String @map("product_id")
-  size_detail String @db.VarChar(20)
+  size_stock_id  Int             @id @default(autoincrement())
+  product_id     String          @map("product_id")
+  size_detail    String          @db.VarChar(20)
   stock_quantity Int
-  status_stock String @db.VarChar(100)
-  product     product @relation(fields: [product_id], references: [product_id])
+  status_stock   String          @db.VarChar(100)
+  product        product         @relation(fields: [product_id], references: [product_id])
   product_stocks product_stock[]
 }
 
 model product_stock {
-  product_stock_id Int @id @default(autoincrement())
-  product_id String @map("product_id")
-  size_stock_id Int
-  product product @relation(fields: [product_id], references: [product_id])
-  size_stock size_stock @relation(fields: [size_stock_id], references: [size_stock_id])
+  product_stock_id Int        @id @default(autoincrement())
+  product_id       String     @map("product_id")
+  size_stock_id    Int
+  product          product    @relation(fields: [product_id], references: [product_id])
+  size_stock       size_stock @relation(fields: [size_stock_id], references: [size_stock_id])
 }
