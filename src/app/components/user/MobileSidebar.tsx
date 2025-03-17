@@ -1,4 +1,7 @@
 'use client';
+import { useState } from 'react';
+import Slide1 from './slides/Slide1';
+import Slide2 from './slides/Slide2';
 
 interface MobileSidebarProps {
   isOpen: boolean;
@@ -7,6 +10,13 @@ interface MobileSidebarProps {
 }
 
 export default function MobileSidebar({ isOpen, toggleSidebar, className }: MobileSidebarProps) {
+  const [slide, setSlide] = useState(1);
+
+  const handleCloseSidebar = () => {
+    toggleSidebar();
+    setSlide(1);
+  };
+
   return (
     <>
       {/* Hamburger Button */}
@@ -40,29 +50,32 @@ export default function MobileSidebar({ isOpen, toggleSidebar, className }: Mobi
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/30 transition-opacity duration-300"
-          onClick={toggleSidebar}
+          onClick={handleCloseSidebar}
         ></div>
       )}
 
       {/* Sidebar */}
-
       <div
-        className={`fixed top-0 right-0 h-full w-72 transform bg-white shadow-lg dark:bg-blue-900 ${
+        className={`fixed top-0 right-0 h-full w-[75%] transform overflow-hidden bg-white shadow-lg dark:bg-blue-900 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         } z-10 transition-transform duration-300 ease-in-out`}
       >
-        {/* เมนูภายใน Sidebar */}
-        <nav className="mt-12 flex flex-col space-y-4 p-6">
-          <a href="#" className="text-lg font-semibold text-gray-900 dark:text-white">
-            Home
-          </a>
-          <a href="#" className="text-lg font-semibold text-gray-900 dark:text-white">
-            About
-          </a>
-          <a href="#" className="text-lg font-semibold text-gray-900 dark:text-white">
-            Shop
-          </a>
-        </nav>
+        {/* Slide 1 */}
+        <div
+          className={`absolute top-0 left-0 h-full w-full transition-transform duration-200 ease-in-out ${
+            slide === 1 ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <Slide1 setSlide={setSlide} />
+        </div>
+        {/* Slide 2 */}
+        <div
+          className={`absolute top-0 left-0 h-full w-full transition-transform duration-200 ease-in-out ${
+            slide === 2 ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
+          <Slide2 setSlide={setSlide} toggleSidebar={toggleSidebar} />
+        </div>
       </div>
     </>
   );
