@@ -9,18 +9,18 @@ const CustomSlider = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <Slider
     ref={ref}
-    className={`w-full ${className}`} // กำหนดให้เต็มความกว้าง
+    className={`w-full ${className}`}
     sx={{
-      color: 'black', // เปลี่ยนสีแถบ Slider เป็นสีดำ
+      color: 'black',
       '& .MuiSlider-thumb': {
-        backgroundColor: 'white', // ปรับให้ตัว Thumb เป็นสีขาว
+        backgroundColor: 'white',
         border: '1px solid gray',
       },
       '& .MuiSlider-track': {
-        backgroundColor: 'black', // เปลี่ยนสีแถบ track เป็นสีดำ
+        backgroundColor: 'black',
       },
       '& .MuiSlider-rail': {
-        backgroundColor: '#e5e7eb', // ปรับสี rail เป็นสีเทา (gray-200)
+        backgroundColor: '#e5e7eb',
       },
     }}
     {...props}
