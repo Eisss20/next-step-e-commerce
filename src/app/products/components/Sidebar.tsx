@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CustomSlider } from '../../components/ui/SliderPrice';
 
 interface SidebarProps {
@@ -16,6 +16,21 @@ export default function Sidebar({
   activeCategory,
   onCategoryChange,
 }: SidebarProps) {
+  // Local state for the slider value
+  const [sliderValue, setSliderValue] = useState<number[]>(priceRange);
+
+  // Update local state when props change
+  useEffect(() => {
+    setSliderValue(priceRange);
+  }, [priceRange]);
+
+  // Handle slider change
+  const handleSliderChange = (_: Event, newValue: number | number[]): void => {
+    const value = newValue as number[];
+    setSliderValue(value);
+    onPriceChange(value);
+  };
+
   const categories: string[] = [
     'All Products',
     'Best Sellers',
@@ -63,16 +78,16 @@ export default function Sidebar({
           </h3>
           <div className="px-2">
             <CustomSlider
-              defaultValue={priceRange}
+              value={sliderValue}
               min={0}
               max={300}
               step={1}
-              onChange={(_, value) => onPriceChange(value as number[])} // ส่งค่า value ที่เลือกไปให้ handlePriceChange
+              onChange={handleSliderChange}
               className="mb-6"
             />
             <div className="flex justify-between text-sm">
-              <span>${priceRange[0]}</span>
-              <span>${priceRange[1]}</span>
+              <span>${sliderValue[0]}</span>
+              <span>${sliderValue[1]}</span>
             </div>
           </div>
         </div>
