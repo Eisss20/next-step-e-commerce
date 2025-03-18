@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import type { ProductType } from '@/types/types';
-import { ChevronDown } from 'lucide-react';
+import { SlArrowDown } from 'react-icons/sl';
 
 interface ProductGridProps {
   products: ProductType[];
@@ -54,7 +54,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
         <div className="relative">
           <button className="flex items-center gap-2 px-3 py-2 text-sm" onClick={toggleDropdown}>
             <span>Sort by: {sortOption}</span>
-            <ChevronDown
+            <SlArrowDown
               size={18}
               className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
             />

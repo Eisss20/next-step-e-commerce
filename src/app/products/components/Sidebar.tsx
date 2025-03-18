@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Slider } from '../../components/ui/SliderPrice';
+import { CustomSlider } from '../../components/ui/SliderPrice';
 
 interface SidebarProps {
   priceRange: number[];
@@ -57,12 +57,12 @@ export default function Sidebar({ priceRange, onPriceChange }: SidebarProps) {
             <span className="text-gray-500">—</span>
           </h3>
           <div className="px-2">
-            <Slider
+            <CustomSlider
               defaultValue={priceRange}
               min={0}
               max={300}
               step={1}
-              onValueChange={onPriceChange}
+              onChange={(_, value) => onPriceChange(value as number[])} // ส่งค่า value ที่เลือกไปให้ handlePriceChange
               className="mb-6"
             />
             <div className="flex justify-between text-sm">

@@ -1,29 +1,32 @@
 'use client';
 
 import * as React from 'react';
-import * as SliderPrimitive from '@radix-ui/react-slider';
+import Slider from '@mui/material/Slider';
 
-const Slider = React.forwardRef<
-  React.ElementRef<typeof SliderPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
+const CustomSlider = React.forwardRef<
+  HTMLSpanElement,
+  React.ComponentPropsWithoutRef<typeof Slider>
 >(({ className, ...props }, ref) => (
-  <SliderPrimitive.Root
+  <Slider
     ref={ref}
-    className={`relative flex w-full touch-none items-center select-none ${className}`}
+    className={`w-full ${className}`} // กำหนดให้เต็มความกว้าง
+    sx={{
+      color: 'black', // เปลี่ยนสีแถบ Slider เป็นสีดำ
+      '& .MuiSlider-thumb': {
+        backgroundColor: 'white', // ปรับให้ตัว Thumb เป็นสีขาว
+        border: '1px solid gray',
+      },
+      '& .MuiSlider-track': {
+        backgroundColor: 'black', // เปลี่ยนสีแถบ track เป็นสีดำ
+      },
+      '& .MuiSlider-rail': {
+        backgroundColor: '#e5e7eb', // ปรับสี rail เป็นสีเทา (gray-200)
+      },
+    }}
     {...props}
-  >
-    <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-gray-200">
-      <SliderPrimitive.Range className="absolute h-full bg-black" /> {/* Change color to black */}
-    </SliderPrimitive.Track>
-    {(props.defaultValue || []).map((_, i) => (
-      <SliderPrimitive.Thumb
-        key={i}
-        className="focus-visible:ring-primary block h-4 w-4 rounded-full border border-gray-200 bg-white ring-offset-white transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-      />
-    ))}
-  </SliderPrimitive.Root>
+  />
 ));
 
-Slider.displayName = SliderPrimitive.Root.displayName;
+CustomSlider.displayName = 'CustomSlider';
 
-export { Slider };
+export { CustomSlider };
