@@ -4,6 +4,10 @@ const prisma = new PrismaClient()
 
 async function main() {
   // ลบข้อมูลเก่าทั้งหมด
+  await prisma.admin_delivery_control.deleteMany()
+  await prisma.admin_product.deleteMany()
+  await prisma.admin_size.deleteMany()
+  await prisma.admin.deleteMany()
   await prisma.user_profile.deleteMany()
   await prisma.address.deleteMany() 
   await prisma.zipcode.deleteMany()
@@ -91,7 +95,7 @@ async function main() {
         color_name: 'Blue',
         price_per_unit: 160.00,
         net_price: 160.00,
-        discount_price: 140.00,
+        discount_price: null,
         description: 'The Nike Zoom Fly 5 is designed for speed and comfort.',
         category_id: categories[1].category_id,
         head_detail: 'Speed Performance',
@@ -106,7 +110,7 @@ async function main() {
         color_name: 'Green',
         price_per_unit: 200.00,
         net_price: 200.00,
-        discount_price: 180.00,
+        discount_price: null,
         description: 'The LeBron 20 features responsive cushioning and lockdown fit.',
         category_id: categories[2].category_id,
         head_detail: 'Basketball Excellence',
@@ -1789,6 +1793,163 @@ async function main() {
     }),
   ]);
 
+  // สร้างข้อมูล admin
+  const admin1 = await prisma.admin.create({
+    data: {
+      first_name: 'สมชาย',
+      last_name: 'ใจดี',
+      email: 'somchai@example.com',
+      password: 'password123',
+      position: 'Manager'
+    }
+  })
+
+  const admin2 = await prisma.admin.create({
+    data: {
+      first_name: 'วิชัย',
+      last_name: 'รักษ์ดี',
+      email: 'wichai@example.com',
+      password: 'password123',
+      position: 'Supervisor'
+    }
+  })
+
+  const admin3 = await prisma.admin.create({
+    data: {
+      first_name: 'มานี',
+      last_name: 'มานะ',
+      email: 'manee@example.com',
+      password: 'password123',
+      position: 'Staff'
+    }
+  })
+
+  // สร้างข้อมูล admin_product
+  const adminProducts = await Promise.all([
+    prisma.admin_product.create({
+      data: {
+        product_id: products[0].product_id,
+        created_by_admin_id: admin1.admin_id,
+        updated_by_admin_id: admin1.admin_id
+      }
+    }),
+    prisma.admin_product.create({
+      data: {
+        product_id: products[1].product_id,
+        created_by_admin_id: admin2.admin_id,
+        updated_by_admin_id: admin2.admin_id
+      }
+    }),
+    prisma.admin_product.create({
+      data: {
+        product_id: products[2].product_id,
+        created_by_admin_id: admin3.admin_id,
+        updated_by_admin_id: admin1.admin_id
+      }
+    }),
+    prisma.admin_product.create({
+      data: {
+        product_id: products[3].product_id,
+        created_by_admin_id: admin1.admin_id,
+        updated_by_admin_id: admin3.admin_id
+      }
+    }),
+    prisma.admin_product.create({
+      data: {
+        product_id: products[4].product_id,
+        created_by_admin_id: admin2.admin_id,
+        updated_by_admin_id: admin2.admin_id
+      }
+    })
+  ])
+
+  // สร้างข้อมูล admin_size
+  const adminSizes = await Promise.all([
+    prisma.admin_size.create({
+      data: {
+        size_stock_id: sizeStocks[0].size_stock_id,
+        size_detail: 'US 8',
+        action_type: 'ADD',
+        created_by_admin_id: admin1.admin_id,
+        updated_by_admin_id: admin1.admin_id
+      }
+    }),
+    prisma.admin_size.create({
+      data: {
+        size_stock_id: sizeStocks[1].size_stock_id,
+        size_detail: 'US 9',
+        action_type: 'ADD',
+        created_by_admin_id: admin1.admin_id,
+        updated_by_admin_id: admin2.admin_id
+      }
+    }),
+    prisma.admin_size.create({
+      data: {
+        size_stock_id: sizeStocks[2].size_stock_id,
+        size_detail: 'US 9',
+        action_type: 'ADD',
+        created_by_admin_id: admin2.admin_id,
+        updated_by_admin_id: admin3.admin_id
+      }
+    }),
+    prisma.admin_size.create({
+      data: {
+        size_stock_id: sizeStocks[3].size_stock_id,
+        size_detail: 'US 10',
+        action_type: 'ADD',
+        created_by_admin_id: admin3.admin_id,
+        updated_by_admin_id: admin1.admin_id
+      }
+    }),
+    prisma.admin_size.create({
+      data: {
+        size_stock_id: sizeStocks[4].size_stock_id,
+        size_detail: 'US 8',
+        action_type: 'ADD',
+        created_by_admin_id: admin1.admin_id,
+        updated_by_admin_id: admin2.admin_id
+      }
+    }),
+    prisma.admin_size.create({
+      data: {
+        size_stock_id: sizeStocks[5].size_stock_id,
+        size_detail: 'US 7',
+        action_type: 'ADD',
+        created_by_admin_id: admin2.admin_id,
+        updated_by_admin_id: admin3.admin_id
+      }
+    })
+  ])
+
+  // สร้างข้อมูล admin_delivery_control
+  const adminDeliveries = await Promise.all([
+    prisma.admin_delivery_control.create({
+      data: {
+        delivery_id: 1, // สมมติว่ามี delivery_id = 1
+        created_by_admin_id: admin1.admin_id,
+        updated_by_admin_id: admin1.admin_id
+      }
+    }),
+    prisma.admin_delivery_control.create({
+      data: {
+        delivery_id: 2, // สมมติว่ามี delivery_id = 2
+        created_by_admin_id: admin2.admin_id,
+        updated_by_admin_id: admin3.admin_id
+      }
+    }),
+    prisma.admin_delivery_control.create({
+      data: {
+        delivery_id: 3, // สมมติว่ามี delivery_id = 3
+        created_by_admin_id: admin3.admin_id,
+        updated_by_admin_id: admin2.admin_id
+      }
+    })
+  ])
+
+  console.log('Created 3 admin records')
+  console.log('Created 3 admin_size records')
+  console.log('Created 3 admin_product records')
+  console.log('Created 3 admin_delivery_control records')
   console.log('Seed data created successfully!')
 }
 
