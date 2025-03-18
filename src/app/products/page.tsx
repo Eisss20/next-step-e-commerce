@@ -1,4 +1,4 @@
-'use client'; // Add this directive at the top
+'use client';
 
 import { useState } from 'react';
 import { ProductType } from '@/types/types';
@@ -7,7 +7,9 @@ import ProductGrid from './components/ProductGrid';
 
 export default function ProductsPage() {
   // State for price range filter
-  const [priceRange, setPriceRange] = useState([0, 300]);
+  const [priceRange, setPriceRange] = useState<number[]>([0, 300]);
+  // State for active category filter
+  const [activeCategory, setActiveCategory] = useState<string>('All Products');
 
   // Sample product data
   const products: ProductType[] = [
@@ -68,29 +70,48 @@ export default function ProductsPage() {
       category: ['Performance Series', 'Best Sellers'],
     },
     {
-      id: 8,
+      id: 9,
       name: 'City Runner',
       price: 109,
       image: '/products-images/shoe-1.avif',
-      category: ['Performance Series','Sale'],
+      category: ['Performance Series', 'Sale'],
     },
   ];
 
   // Handle price range change
-  const handlePriceChange = (value: number[]) => {
+  const handlePriceChange = (value: number[]): void => {
     setPriceRange(value);
   };
 
-  // Filter products by the selected price range
-  const filteredProducts = products.filter(
-    (product) => product.price >= priceRange[0] && product.price <= priceRange[1]
-  );
+  // Handle category change
+  const handleCategoryChange = (category: string): void => {
+    setActiveCategory(category);
+  };
+
+  // Filter products by the selected price range and category
+  const filteredProducts: ProductType[] = products.filter((product: ProductType) => {
+    // Price filter
+    const priceMatch: boolean = product.price >= priceRange[0] && product.price <= priceRange[1];
+
+    // Category filter
+    let categoryMatch: boolean = true;
+    if (activeCategory !== 'All Products') {
+      categoryMatch = product.category?.includes(activeCategory) || false;
+    }
+
+    return priceMatch && categoryMatch;
+  });
 
   return (
     <div className="mx-auto py-12 sm:px-20">
       <div className="flex flex-col gap-10 md:flex-row">
-        {/* Pass price range and filter change function to Sidebar */}
-        <Sidebar priceRange={priceRange} onPriceChange={handlePriceChange} />
+        {/* Pass price range, active category, and handlers to Sidebar */}
+        <Sidebar
+          priceRange={priceRange}
+          onPriceChange={handlePriceChange}
+          activeCategory={activeCategory}
+          onCategoryChange={handleCategoryChange}
+        />
         {/* Pass the filtered products to ProductGrid */}
         <ProductGrid products={filteredProducts} />
       </div>

@@ -6,12 +6,17 @@ import { CustomSlider } from '../../components/ui/SliderPrice';
 interface SidebarProps {
   priceRange: number[];
   onPriceChange: (value: number[]) => void;
+  activeCategory: string;
+  onCategoryChange: (category: string) => void;
 }
 
-export default function Sidebar({ priceRange, onPriceChange }: SidebarProps) {
-  const [activeCategory, setActiveCategory] = useState('All Products');
-
-  const categories = [
+export default function Sidebar({
+  priceRange,
+  onPriceChange,
+  activeCategory,
+  onCategoryChange,
+}: SidebarProps) {
+  const categories: string[] = [
     'All Products',
     'Best Sellers',
     'Sale',
@@ -34,13 +39,13 @@ export default function Sidebar({ priceRange, onPriceChange }: SidebarProps) {
       <div className="mb-8">
         <h2 className="mb-4 text-lg font-medium">Browse by</h2>
         <ul className="space-y-2">
-          {categories.map((category) => (
+          {categories.map((category: string) => (
             <li key={category}>
               <button
                 className={`w-full py-1 text-left text-sm ${
                   activeCategory === category ? 'font-semibold' : 'text-gray-600'
                 }`}
-                onClick={() => setActiveCategory(category)}
+                onClick={() => onCategoryChange(category)}
               >
                 {category}
               </button>
