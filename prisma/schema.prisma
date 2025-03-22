@@ -16,14 +16,15 @@ model product {
   color_name     String   @db.VarChar(100)
   price_per_unit Decimal  @db.Decimal(10, 2)
   net_price      Decimal  @db.Decimal(10, 2)
-  discount_price Decimal? @db.Decimal(10, 2)
   description    String
   category_id    Int
   head_detail    String
   detail_product String
-  tag_id         Int
+  label_id       Int
+  discout_percent Int?
+  sale_status    Boolean @default(false)  
 
-  tag            tag             @relation(fields: [tag_id], references: [tag_id])
+  label            label             @relation(fields: [label_id], references: [label_id])
   category       category        @relation(fields: [category_id], references: [category_id])
   product_images product_image[]
   size_stocks    size_stock[]
@@ -31,9 +32,9 @@ model product {
   admin_products admin_product[]
 }
 
-model tag {
-  tag_id   Int    @id @default(autoincrement())
-  tag_name String @unique
+model label {
+  label_id   Int    @id @default(autoincrement())
+  label_name String @unique
 
   products product[]
 }

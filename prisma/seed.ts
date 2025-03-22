@@ -20,33 +20,33 @@ async function main() {
   await prisma.product_image.deleteMany()
   await prisma.product.deleteMany()
   await prisma.category.deleteMany()
-  await prisma.tag.deleteMany()
+  await prisma.label.deleteMany()
 
-  // สร้าง Tags
-  const tags = await Promise.all([
-    prisma.tag.create({
+  // สร้าง Labels
+  const labels = await Promise.all([
+    prisma.label.create({
       data: {
-        tag_name: 'Sale',
+        label_name: 'Sale',
       },
     }),
-    prisma.tag.create({
+    prisma.label.create({
       data: {
-        tag_name: 'New Arrival',
+        label_name: 'New Arrival',
       },
     }),
-    prisma.tag.create({
+    prisma.label.create({
       data: {
-        tag_name: 'Best Seller',
+        label_name: 'Best Seller',
       },
     }), 
-    prisma.tag.create({
+    prisma.label.create({
       data: {
-        tag_name: 'Limited Edition',
+        label_name: 'Limited Edition',
       },
     }),
-    prisma.tag.create({
+    prisma.label.create({
       data: {
-        tag_name: 'Popular',
+        label_name: 'Popular',
       },
     }),
   ])
@@ -80,12 +80,13 @@ async function main() {
         color_name: 'Red',
         price_per_unit: 150.00,
         net_price: 150.00,
-        discount_price: 120.00,
         description: 'The Nike Air Max 270 delivers unrivaled comfort with its large Air unit.',
         category_id: categories[0].category_id,
         head_detail: 'Premium Comfort',
         detail_product: 'Detailed description of Nike Air Max 270',
-        tag_id: tags[0].tag_id,
+        label_id: labels[0].label_id,
+        discout_percent: 20,
+        sale_status: true
       },
     }),
     prisma.product.create({
@@ -95,12 +96,13 @@ async function main() {
         color_name: 'Blue',
         price_per_unit: 160.00,
         net_price: 160.00,
-        discount_price: null,
         description: 'The Nike Zoom Fly 5 is designed for speed and comfort.',
         category_id: categories[1].category_id,
         head_detail: 'Speed Performance',
         detail_product: 'Detailed description of Nike Zoom Fly 5',
-        tag_id: tags[1].tag_id,
+        label_id: labels[1].label_id,
+        discout_percent: null,
+        sale_status: false
       },
     }),
     prisma.product.create({
@@ -110,12 +112,13 @@ async function main() {
         color_name: 'Green',
         price_per_unit: 200.00,
         net_price: 200.00,
-        discount_price: null,
         description: 'The LeBron 20 features responsive cushioning and lockdown fit.',
         category_id: categories[2].category_id,
         head_detail: 'Basketball Excellence',
         detail_product: 'Detailed description of Nike LeBron 20',
-        tag_id: tags[2].tag_id,
+        label_id: labels[2].label_id,
+        discout_percent: null,
+        sale_status: false
       },
     }),
     prisma.product.create({
@@ -125,12 +128,13 @@ async function main() {
         color_name: 'Black',
         price_per_unit: 180.00,
         net_price: 180.00,
-        discount_price: 150.00,
         description: 'Experience incredible energy return with the Adidas Ultraboost.',
         category_id: categories[1].category_id,
         head_detail: 'Energy Return',
         detail_product: 'Detailed description of Adidas Ultraboost',
-        tag_id: tags[3].tag_id,
+        label_id: labels[3].label_id,
+        discout_percent: 16,
+        sale_status: true
       },
     }),
     prisma.product.create({
@@ -140,12 +144,13 @@ async function main() {
         color_name: 'White',
         price_per_unit: 120.00,
         net_price: 120.00,
-        discount_price: 100.00,
         description: 'The Puma RS-X celebrates retro-inspired chunky design.',
         category_id: categories[0].category_id,
         head_detail: 'Retro Design',
         detail_product: 'Detailed description of Puma RS-X',
-        tag_id: tags[0].tag_id,
+        label_id: labels[0].label_id,
+        discout_percent: 16,
+        sale_status: true
       },
     }),
   ])
