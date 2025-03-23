@@ -11,25 +11,26 @@ datasource db {
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 
 model product {
-  product_id     String   @id @unique @default("") @db.VarChar(30)
-  product_name   String   @db.VarChar(50)
-  color_name     String   @db.VarChar(100)
-  price_per_unit Decimal  @db.Decimal(10, 2)
-  net_price      Decimal  @db.Decimal(10, 2)
-  description    String
-  category_id    Int
-  head_detail    String
-  detail_product String
-  label_id       Int
+  product_id      String  @id @unique @default("") @db.VarChar(30)
+  product_name    String  @db.VarChar(50)
+  color_name      String  @db.VarChar(100)
+  price_per_unit  Decimal @db.Decimal(10, 2)
+  net_price       Decimal @db.Decimal(10, 2)
+  description     String
+  category_id     Int
+  head_detail     String
+  detail_product  String
+  label_id        Int
   discout_percent Int?
-  sale_status    Boolean @default(false)  
+  sale_status     Boolean @default(false)
 
-  label            label             @relation(fields: [label_id], references: [label_id])
+  label          label           @relation(fields: [label_id], references: [label_id])
   category       category        @relation(fields: [category_id], references: [category_id])
   product_images product_image[]
   size_stocks    size_stock[]
   product_stocks product_stock[]
   admin_products admin_product[]
+  checkout_items checkout_item[]
 }
 
 model label {
@@ -65,6 +66,7 @@ model size_stock {
   product        product         @relation(fields: [product_id], references: [product_id])
   product_stocks product_stock[]
   admin_sizes    admin_size[]
+  checkout_item  checkout_item[]
 }
 
 model product_stock {
@@ -78,13 +80,15 @@ model product_stock {
 // -------------------------------------------------------- user section --------------------------------------------------------------------------
 
 model user {
-  user_id       String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  username      String         @unique
-  password      String
-  email         String         @unique
-  created_at    DateTime       @default(now())
-  updated_at    DateTime       @updatedAt
-  user_profiles user_profile[]
+  user_id        String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username       String          @unique
+  password       String
+  email          String          @unique
+  created_at     DateTime        @default(now())
+  updated_at     DateTime        @updatedAt
+  user_profiles  user_profile[]
+  checkout_items checkout_item[]
+  payments       payment[]
 }
 
 model user_profile {
@@ -201,12 +205,75 @@ model admin_product {
 
 // ต้องรอ section order ขึ้น 
 model admin_delivery_control {
-  admin_delivery_control_id Int      @id @default(autoincrement())
+  admin_delivery_control_id Int       @id @default(autoincrement())
   delivery_id               Int?
-  created_by_admin_id       String   @db.Uuid
-  updated_by_admin_id       String   @db.Uuid
-  created_at                DateTime @default(now())
-  updated_at                DateTime @updatedAt
-  created_by_admin          admin    @relation("admin_delivery_created_by", fields: [created_by_admin_id], references: [admin_id])
-  updated_by_admin          admin    @relation("admin_delivery_updated_by", fields: [updated_by_admin_id], references: [admin_id])
+  created_by_admin_id       String    @db.Uuid
+  updated_by_admin_id       String    @db.Uuid
+  created_at                DateTime? @default(now()) @map("created_at")
+  updated_at                DateTime? @updatedAt @map("update_date")
+  created_by_admin          admin     @relation("admin_delivery_created_by", fields: [created_by_admin_id], references: [admin_id])
+  updated_by_admin          admin     @relation("admin_delivery_updated_by", fields: [updated_by_admin_id], references: [admin_id])
+  delivery                  delivery? @relation(fields: [delivery_id], references: [delivery_id])
+}
+
+
+// ------------------------------------------------- order section -------------------------------------------------------------------------- 
+
+model checkout_item {
+  checkout_item_id Int      @id @default(autoincrement())
+  user_id          String   @db.Uuid
+  product_id       String   @db.VarChar(30)
+  size_stock_id    Int
+  quantity         Int
+  delivery_fee     Decimal  @db.Decimal(10, 2)
+  net_price        Decimal  @db.Decimal(10, 2)
+  status_checkout  String   @db.VarChar(100)
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  user       user       @relation(fields: [user_id], references: [user_id])
+  product    product    @relation(fields: [product_id], references: [product_id])
+  size_stock size_stock @relation(fields: [size_stock_id], references: [size_stock_id])
+  payment    payment?  
+}
+
+model payment {
+  payment_id        Int       @id @default(autoincrement())
+  user_id           String    @db.Uuid
+  checkout_item_id  Int       @unique
+  payment_intent_id String    @db.VarChar(100)
+  net_price         Decimal   @db.Decimal(10, 2)
+  payment_method    String    @db.VarChar(100)
+  payment_status    String    @db.VarChar(100)
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  user         user         @relation(fields: [user_id], references: [user_id])
+  checkout_item   checkout_item @relation(fields: [checkout_item_id], references: [checkout_item_id])
+  order order?
+}
+
+model order {
+  order_id     Int      @id @default(autoincrement())
+  payment_id   Int      @unique
+  total_price  Decimal  @db.Decimal(10, 2)
+  commend_user String   @db.VarChar(100)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  payment payment @relation(fields: [payment_id], references: [payment_id])
+  delivery delivery?
+}
+
+model delivery {
+  delivery_id     Int      @id @default(autoincrement())
+  order_id        Int      @unique
+  delivery_status String   @db.VarChar(100)
+  tracking_number String?  @db.VarChar(100)
+  carrier_name    String?  @db.VarChar(100)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  order                     order                     @relation(fields: [order_id], references: [order_id])
+  admin_delivery_control    admin_delivery_control[]
 }
