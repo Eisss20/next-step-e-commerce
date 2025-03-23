@@ -5,6 +5,10 @@ const prisma = new PrismaClient()
 async function main() {
   // ลบข้อมูลเก่าทั้งหมด
   await prisma.admin_delivery_control.deleteMany()
+  await prisma.delivery.deleteMany()
+  await prisma.order.deleteMany()
+  await prisma.payment.deleteMany()
+  await prisma.checkout_item.deleteMany()
   await prisma.admin_product.deleteMany()
   await prisma.admin_size.deleteMany()
   await prisma.admin.deleteMany()
@@ -20,33 +24,33 @@ async function main() {
   await prisma.product_image.deleteMany()
   await prisma.product.deleteMany()
   await prisma.category.deleteMany()
-  await prisma.tag.deleteMany()
+  await prisma.label.deleteMany()
 
-  // สร้าง Tags
-  const tags = await Promise.all([
-    prisma.tag.create({
+  // สร้าง Labels
+  const labels = await Promise.all([
+    prisma.label.create({
       data: {
-        tag_name: 'Sale',
+        label_name: 'Sale',
       },
     }),
-    prisma.tag.create({
+    prisma.label.create({
       data: {
-        tag_name: 'New Arrival',
+        label_name: 'New Arrival',
       },
     }),
-    prisma.tag.create({
+    prisma.label.create({
       data: {
-        tag_name: 'Best Seller',
+        label_name: 'Best Seller',
       },
     }), 
-    prisma.tag.create({
+    prisma.label.create({
       data: {
-        tag_name: 'Limited Edition',
+        label_name: 'Limited Edition',
       },
     }),
-    prisma.tag.create({
+    prisma.label.create({
       data: {
-        tag_name: 'Popular',
+        label_name: 'Popular',
       },
     }),
   ])
@@ -80,12 +84,13 @@ async function main() {
         color_name: 'Red',
         price_per_unit: 150.00,
         net_price: 150.00,
-        discount_price: 120.00,
         description: 'The Nike Air Max 270 delivers unrivaled comfort with its large Air unit.',
         category_id: categories[0].category_id,
         head_detail: 'Premium Comfort',
         detail_product: 'Detailed description of Nike Air Max 270',
-        tag_id: tags[0].tag_id,
+        label_id: labels[0].label_id,
+        discout_percent: 20,
+        sale_status: true
       },
     }),
     prisma.product.create({
@@ -95,12 +100,13 @@ async function main() {
         color_name: 'Blue',
         price_per_unit: 160.00,
         net_price: 160.00,
-        discount_price: null,
         description: 'The Nike Zoom Fly 5 is designed for speed and comfort.',
         category_id: categories[1].category_id,
         head_detail: 'Speed Performance',
         detail_product: 'Detailed description of Nike Zoom Fly 5',
-        tag_id: tags[1].tag_id,
+        label_id: labels[1].label_id,
+        discout_percent: null,
+        sale_status: false
       },
     }),
     prisma.product.create({
@@ -110,12 +116,13 @@ async function main() {
         color_name: 'Green',
         price_per_unit: 200.00,
         net_price: 200.00,
-        discount_price: null,
         description: 'The LeBron 20 features responsive cushioning and lockdown fit.',
         category_id: categories[2].category_id,
         head_detail: 'Basketball Excellence',
         detail_product: 'Detailed description of Nike LeBron 20',
-        tag_id: tags[2].tag_id,
+        label_id: labels[2].label_id,
+        discout_percent: null,
+        sale_status: false
       },
     }),
     prisma.product.create({
@@ -125,12 +132,13 @@ async function main() {
         color_name: 'Black',
         price_per_unit: 180.00,
         net_price: 180.00,
-        discount_price: 150.00,
         description: 'Experience incredible energy return with the Adidas Ultraboost.',
         category_id: categories[1].category_id,
         head_detail: 'Energy Return',
         detail_product: 'Detailed description of Adidas Ultraboost',
-        tag_id: tags[3].tag_id,
+        label_id: labels[3].label_id,
+        discout_percent: 16,
+        sale_status: true
       },
     }),
     prisma.product.create({
@@ -140,12 +148,13 @@ async function main() {
         color_name: 'White',
         price_per_unit: 120.00,
         net_price: 120.00,
-        discount_price: 100.00,
         description: 'The Puma RS-X celebrates retro-inspired chunky design.',
         category_id: categories[0].category_id,
         head_detail: 'Retro Design',
         detail_product: 'Detailed description of Puma RS-X',
-        tag_id: tags[0].tag_id,
+        label_id: labels[0].label_id,
+        discout_percent: 16,
+        sale_status: true
       },
     }),
   ])
@@ -1793,6 +1802,130 @@ async function main() {
     }),
   ]);
 
+  // สร้างข้อมูล checkout_item
+  const checkoutItems = await Promise.all([
+    prisma.checkout_item.create({
+      data: {
+        user_id: users[0].user_id,
+        product_id: products[0].product_id,
+        size_stock_id: sizeStocks[0].size_stock_id,
+        quantity: 1,
+        delivery_fee: 50.00,
+        net_price: 200.00,
+        status_checkout: 'Completed'
+      }
+    }),
+    prisma.checkout_item.create({
+      data: {
+        user_id: users[1].user_id,
+        product_id: products[1].product_id,
+        size_stock_id: sizeStocks[2].size_stock_id,
+        quantity: 2,
+        delivery_fee: 50.00,
+        net_price: 370.00,
+        status_checkout: 'Completed'
+      }
+    }),
+    prisma.checkout_item.create({
+      data: {
+        user_id: users[2].user_id,
+        product_id: products[2].product_id,
+        size_stock_id: sizeStocks[3].size_stock_id,
+        quantity: 1,
+        delivery_fee: 50.00,
+        net_price: 250.00,
+        status_checkout: 'Completed'
+      }
+    }),
+  ]);
+
+  // สร้างข้อมูล payment
+  const payments = await Promise.all([
+    prisma.payment.create({
+      data: {
+        user_id: users[0].user_id,
+        checkout_item_id: checkoutItems[0].checkout_item_id,
+        payment_intent_id: 'pi_1Ngs7tKFgvmF92',
+        net_price: 200.00,
+        payment_method: 'Credit Card',
+        payment_status: 'Completed'
+      }
+    }),
+    prisma.payment.create({
+      data: {
+        user_id: users[1].user_id,
+        checkout_item_id: checkoutItems[1].checkout_item_id,
+        payment_intent_id: 'pi_1Ngs7tKFgvmF93',
+        net_price: 370.00,
+        payment_method: 'PayPal',
+        payment_status: 'Completed'
+      }
+    }),
+    prisma.payment.create({
+      data: {
+        user_id: users[2].user_id,
+        checkout_item_id: checkoutItems[2].checkout_item_id,
+        payment_intent_id: 'pi_1Ngs7tKFgvmF94',
+        net_price: 250.00,
+        payment_method: 'Credit Card',
+        payment_status: 'Completed'
+      }
+    })
+  ]);
+
+  // สร้างข้อมูล order
+  const orders = await Promise.all([
+    prisma.order.create({
+      data: {
+        payment_id: payments[0].payment_id,
+        total_price: 200.00,
+        commend_user: 'Please deliver carefully.'
+      }
+    }),
+    prisma.order.create({
+      data: {
+        payment_id: payments[1].payment_id,
+        total_price: 370.00,
+        commend_user: 'Leave package at the door.'
+      }
+    }),
+    prisma.order.create({
+      data: {
+        payment_id: payments[2].payment_id,
+        total_price: 250.00,
+        commend_user: 'Call before delivery.'
+      }
+    })
+  ]);
+
+  // สร้างข้อมูล delivery
+  const deliveries = await Promise.all([
+    prisma.delivery.create({
+      data: {
+        order_id: orders[0].order_id,
+        delivery_status: 'Shipped',
+        tracking_number: 'TH1234567890',
+        carrier_name: 'Thai Post'
+      }
+    }),
+    prisma.delivery.create({
+      data: {
+        order_id: orders[1].order_id,
+        delivery_status: 'Processing',
+        tracking_number: 'TH0987654321',
+        carrier_name: 'Kerry Express'
+      }
+    }),
+    prisma.delivery.create({
+      data: {
+        order_id: orders[2].order_id,
+        delivery_status: 'Pending',
+        tracking_number: null,
+        carrier_name: null
+      }
+    })
+  ]);
+
   // สร้างข้อมูล admin
   const admin1 = await prisma.admin.create({
     data: {
@@ -1925,21 +2058,21 @@ async function main() {
   const adminDeliveries = await Promise.all([
     prisma.admin_delivery_control.create({
       data: {
-        delivery_id: 1, // สมมติว่ามี delivery_id = 1
+        delivery_id: deliveries[0].delivery_id,
         created_by_admin_id: admin1.admin_id,
         updated_by_admin_id: admin1.admin_id
       }
     }),
     prisma.admin_delivery_control.create({
       data: {
-        delivery_id: 2, // สมมติว่ามี delivery_id = 2
+        delivery_id: deliveries[1].delivery_id,
         created_by_admin_id: admin2.admin_id,
         updated_by_admin_id: admin3.admin_id
       }
     }),
     prisma.admin_delivery_control.create({
       data: {
-        delivery_id: 3, // สมมติว่ามี delivery_id = 3
+        delivery_id: deliveries[2].delivery_id,
         created_by_admin_id: admin3.admin_id,
         updated_by_admin_id: admin2.admin_id
       }
