@@ -1,8 +1,6 @@
-import Image from "next/image";
 import * as motion from "motion/react-client"
 import ButtonMain from "./ButtonMain";
 
-// เหลือวาง Logic  วนลูปแสดงข้อมูลสินค้าที่มีในระบบ
 
 export default function CardItemFlashSale() {
     return (
