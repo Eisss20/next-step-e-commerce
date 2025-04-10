@@ -10,35 +10,35 @@ type Product = {
   ads: string;
 };
 
-export default function CardBestSeller() {
+export default function CardCollection() {
   const productSellers: Product[] = [
     {
       name: 'Nike Air Max 270',
-      ads: 'best seller',
+      ads: 'Limited Edition',
       price: 150,
-      img: '/images/products/NIKEAIRMAX16OGG-1.png',
-      hoverimg: '/images/products/NIKEAIRMAX16OGG-2.png',
+      img: '/images/products/limited-1.png',
+      hoverimg: '/images/products/limited-hover-1.png',
     },
     {
       name: 'Adidas Ultraboost',
-      ads: 'best seller',
+      ads: 'Limited Edition',
       price: 180,
-      img: '/images/products/NIKEFREEMETCON6-1.png',
-      hoverimg: '/images/products/NIKEFREMETCON6-2.png',
+      img: '/images/products/limited-2.png',
+      hoverimg: '/images/products/limited-hover-2.png',
     },
     {
       name: 'Puma RS-X',
-      ads: 'best seller',
+      ads: 'Limited Edition',
       price: 120,
-      img: '/images/products/NIKECOURTVISIONLONN-1.png',
-      hoverimg: '/images/products/NIKECOURTVISIONLONN-2.png',
+      img: '/images/products/limited-3.png',
+      hoverimg: '/images/products/limited-hover-3.png',
     },
     {
       name: 'Nike Air Max 270',
-      ads: 'best seller',
+      ads: 'Limited Edition',
       price: 150,
-      img: '/images/products/WAIRFORCE107FLYEASE-2.png',
-      hoverimg: '/images/products/WAIRFORCE107FLYEASE-1.png',
+      img: '/images/products/limited-4.png',
+      hoverimg: '/images/products/limited-hover-4.png',
     },
   ];
 
@@ -53,7 +53,7 @@ export default function CardBestSeller() {
       { threshold: 0.1 }
     );
 
-    const section = document.getElementById('best-seller-section');
+    const section = document.getElementById('collection-section');
     if (section) {
       observer.observe(section);
     }
@@ -66,8 +66,8 @@ export default function CardBestSeller() {
   }, []);
 
   return (
-    <section id="best-seller-section" className="container mx-auto mt-10 h-full w-full">
-      <div className="relative">
+    <section id="collection-section" className="container mx-auto mt-10 h-full w-full">
+      <div className="offset-0 relative">
         <div className="mt-10 lg:flex lg:flex-row lg:space-x-5">
           {productSellers.map((product, index) => (
             <motion.div
@@ -84,11 +84,11 @@ export default function CardBestSeller() {
               </span>
 
               {/* รูปสินค้า */}
-              <div className="flex h-[25.5rem] items-center justify-center rounded-xl bg-[#F6F6F6] p-4 shadow lg:w-full">
+              <div className="flex h-[25.5rem] items-center justify-center rounded-xl bg-[#F6F6F6] shadow lg:w-full">
                 <img
                   src={hoverIndex === index ? product.hoverimg : product.img}
                   alt={product.name}
-                  className="h-[90%] w-[90%] object-contain transition-transform duration-300 hover:scale-105"
+                  className="h-[90%] w-[90%] scale-110 object-contain transition-transform duration-300"
                 />
               </div>
 
