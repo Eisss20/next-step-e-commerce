@@ -14,3 +14,23 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+
+/* ป้องกัน iOS ปรับขนาดตัวอักษรอัตโนมัติ */
+body, input, textarea, select, button {
+  -webkit-text-size-adjust: 100%;  /* ป้องกัน Safari บน iOS/macOS ปรับขนาดฟอนต์อัตโนมัติ */
+  -moz-text-size-adjust: 100%;     /* ป้องกัน Firefox ปรับขนาดฟอนต์อัตโนมัติ */
+  -ms-text-size-adjust: 100%;      /* ป้องกัน Microsoft Edge รุ่นเก่า */
+  text-size-adjust: 100%;          /* ป้องกัน browser อื่นๆ ที่รองรับ text-size-adjust */
+}
+
+
+
+/* ปรับการเลื่อนหน้าจอให้นุ่มนวลขึ้น */
+html {
+  scroll-behavior: smooth;
+}

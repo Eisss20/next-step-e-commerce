@@ -9,16 +9,270 @@ datasource db {
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model user_test {
-  id         Int      @id @default(autoincrement())
-  name       String?
-  email      String?
-  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+model product {
+  product_id      String  @id @unique @default("") @db.VarChar(30)
+  product_name    String  @db.VarChar(50)
+  color_name      String  @db.VarChar(100)
+  price_per_unit  Decimal @db.Decimal(10, 2)
+  net_price       Decimal @db.Decimal(10, 2)
+  description     String
+  category_id     Int
+  head_detail     String
+  detail_product  String
+  label_id        Int
+  discout_percent Int?
+  sale_status     Boolean @default(false)
+
+  label          label           @relation(fields: [label_id], references: [label_id])
+  category       category        @relation(fields: [category_id], references: [category_id])
+  product_images product_image[]
+  size_stocks    size_stock[]
+  product_stocks product_stock[]
+  admin_products admin_product[]
+  checkout_items checkout_item[]
 }
 
-model post_test {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String?
-  createdAt DateTime @default(now())
+model label {
+  label_id   Int    @id @default(autoincrement())
+  label_name String @unique
+
+  products product[]
+}
+
+model category {
+  category_id   Int    @id @default(autoincrement())
+  category_name String @unique
+
+  products product[]
+}
+
+model product_image {
+  product_image_id  Int       @id @default(autoincrement())
+  product_id        String    @map("product_id")
+  product_image_url String
+  position_image    Int?
+  product           product   @relation(fields: [product_id], references: [product_id])
+  created_at        DateTime? @default(now())
+  updated_at        DateTime? @updatedAt
+}
+
+model size_stock {
+  size_stock_id  Int             @id @default(autoincrement())
+  product_id     String          @map("product_id")
+  size_detail    String          @db.VarChar(20)
+  stock_quantity Int
+  status_stock   String          @db.VarChar(100)
+  product        product         @relation(fields: [product_id], references: [product_id])
+  product_stocks product_stock[]
+  admin_sizes    admin_size[]
+  checkout_item  checkout_item[]
+}
+
+model product_stock {
+  product_stock_id Int        @id @default(autoincrement())
+  product_id       String     @map("product_id")
+  size_stock_id    Int
+  product          product    @relation(fields: [product_id], references: [product_id])
+  size_stock       size_stock @relation(fields: [size_stock_id], references: [size_stock_id])
+}
+
+// -------------------------------------------------------- user section --------------------------------------------------------------------------
+
+model user {
+  user_id        String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username       String          @unique
+  password       String
+  email          String          @unique
+  created_at     DateTime        @default(now())
+  updated_at     DateTime        @updatedAt
+  user_profiles  user_profile[]
+  checkout_items checkout_item[]
+  payments       payment[]
+}
+
+model user_profile {
+  user_profile_id Int      @id @default(autoincrement())
+  user_id         String   @db.Uuid
+  first_name      String
+  last_name       String
+  phone_number    String
+  address_id      Int
+  age             Int
+  gender          String
+  date_of_birth   DateTime
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  user    user    @relation(fields: [user_id], references: [user_id])
+  address address @relation(fields: [address_id], references: [address_id])
+}
+
+model address {
+  address_id        Int    @id @default(autoincrement())
+  detail_address    String
+  location_id       Int
+  city_id           Int
+  province_state_id Int
+  zipcode_id        Int
+  telephone_number  String @db.VarChar(15)
+
+  city           city           @relation(fields: [city_id], references: [city_id])
+  province_state province_state @relation(fields: [province_state_id], references: [province_state_id])
+  zipcode        zipcode        @relation(fields: [zipcode_id], references: [zipcode_id])
+  user_profiles  user_profile[]
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @updatedAt
+}
+
+model location {
+  location_id     Int              @id @default(autoincrement())
+  location_name   String           @unique
+  province_states province_state[]
+}
+
+model province_state {
+  province_state_id   Int       @id @default(autoincrement())
+  province_state_name String    @unique
+  location_id         Int
+  type                String    @db.VarChar(10)
+  location            location  @relation(fields: [location_id], references: [location_id])
+  cities              city[]
+  addresses           address[]
+}
+
+model city {
+  city_id           Int            @id @default(autoincrement())
+  province_state_id Int
+  city_name         String         @unique
+  province_state    province_state @relation(fields: [province_state_id], references: [province_state_id])
+  zipcodes          zipcode[]
+  addresses         address[]
+}
+
+model zipcode {
+  zipcode_id Int       @id @default(autoincrement())
+  zipcode    String    @unique @db.VarChar(10)
+  city_id    Int
+  city       city      @relation(fields: [city_id], references: [city_id])
+  addresses  address[]
+}
+
+// ------------------------------------------------- admin section -------------------------------------------------------------------------- 
+
+model admin {
+  admin_id                       String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  first_name                     String
+  last_name                      String
+  email                          String                   @unique
+  password                       String
+  position                       String
+  created_at                     DateTime                 @default(now())
+  updated_at                     DateTime                 @updatedAt
+  admin_sizes_created            admin_size[]             @relation("admin_size_created_by")
+  admin_sizes_updated            admin_size[]             @relation("admin_size_updated_by")
+  admin_products_created         admin_product[]          @relation("admin_product_created_by")
+  admin_products_updated         admin_product[]          @relation("admin_product_updated_by")
+  admin_delivery_control_created admin_delivery_control[] @relation("admin_delivery_created_by")
+  admin_delivery_control_updated admin_delivery_control[] @relation("admin_delivery_updated_by")
+}
+
+model admin_size {
+  admin_size_id       Int        @id @default(autoincrement())
+  size_stock_id       Int
+  size_detail         String     @db.VarChar(20)
+  action_type         String     @db.VarChar(10)
+  created_by_admin_id String     @db.Uuid
+  updated_by_admin_id String     @db.Uuid
+  created_at          DateTime   @default(now())
+  updated_at          DateTime   @updatedAt
+  created_by_admin    admin      @relation("admin_size_created_by", fields: [created_by_admin_id], references: [admin_id])
+  updated_by_admin    admin      @relation("admin_size_updated_by", fields: [updated_by_admin_id], references: [admin_id])
+  size_stock          size_stock @relation(fields: [size_stock_id], references: [size_stock_id])
+}
+
+model admin_product {
+  admin_product_id    Int      @id @default(autoincrement())
+  product_id          String   @db.VarChar(30)
+  created_by_admin_id String   @db.Uuid
+  updated_by_admin_id String   @db.Uuid
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+  created_by_admin    admin    @relation("admin_product_created_by", fields: [created_by_admin_id], references: [admin_id])
+  updated_by_admin    admin    @relation("admin_product_updated_by", fields: [updated_by_admin_id], references: [admin_id])
+  product             product  @relation(fields: [product_id], references: [product_id])
+}
+
+// ต้องรอ section order ขึ้น 
+model admin_delivery_control {
+  admin_delivery_control_id Int       @id @default(autoincrement())
+  delivery_id               Int?
+  created_by_admin_id       String    @db.Uuid
+  updated_by_admin_id       String    @db.Uuid
+  created_at                DateTime? @default(now()) @map("created_at")
+  updated_at                DateTime? @updatedAt @map("update_date")
+  created_by_admin          admin     @relation("admin_delivery_created_by", fields: [created_by_admin_id], references: [admin_id])
+  updated_by_admin          admin     @relation("admin_delivery_updated_by", fields: [updated_by_admin_id], references: [admin_id])
+  delivery                  delivery? @relation(fields: [delivery_id], references: [delivery_id])
+}
+
+// ------------------------------------------------- order section -------------------------------------------------------------------------- 
+
+model checkout_item {
+  checkout_item_id Int      @id @default(autoincrement())
+  user_id          String   @db.Uuid
+  product_id       String   @db.VarChar(30)
+  size_stock_id    Int
+  quantity         Int
+  delivery_fee     Decimal  @db.Decimal(10, 2)
+  net_price        Decimal  @db.Decimal(10, 2)
+  status_checkout  String   @db.VarChar(100)
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  user       user       @relation(fields: [user_id], references: [user_id])
+  product    product    @relation(fields: [product_id], references: [product_id])
+  size_stock size_stock @relation(fields: [size_stock_id], references: [size_stock_id])
+  payment    payment?
+}
+
+model payment {
+  payment_id        Int      @id @default(autoincrement())
+  user_id           String   @db.Uuid
+  checkout_item_id  Int      @unique
+  payment_intent_id String   @db.VarChar(100)
+  net_price         Decimal  @db.Decimal(10, 2)
+  payment_method    String   @db.VarChar(100)
+  payment_status    String   @db.VarChar(100)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  user          user          @relation(fields: [user_id], references: [user_id])
+  checkout_item checkout_item @relation(fields: [checkout_item_id], references: [checkout_item_id])
+  order         order?
+}
+
+model order {
+  order_id     Int      @id @default(autoincrement())
+  payment_id   Int      @unique
+  total_price  Decimal  @db.Decimal(10, 2)
+  commend_user String   @db.VarChar(100)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  payment  payment   @relation(fields: [payment_id], references: [payment_id])
+  delivery delivery?
+}
+
+model delivery {
+  delivery_id     Int      @id @default(autoincrement())
+  order_id        Int      @unique
+  delivery_status String   @db.VarChar(100)
+  tracking_number String?  @db.VarChar(100)
+  carrier_name    String?  @db.VarChar(100)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  order                  order                    @relation(fields: [order_id], references: [order_id])
+  admin_delivery_control admin_delivery_control[]
 }
