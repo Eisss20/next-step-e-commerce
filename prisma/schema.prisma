@@ -216,7 +216,6 @@ model admin_delivery_control {
   delivery                  delivery? @relation(fields: [delivery_id], references: [delivery_id])
 }
 
-
 // ------------------------------------------------- order section -------------------------------------------------------------------------- 
 
 model checkout_item {
@@ -234,23 +233,23 @@ model checkout_item {
   user       user       @relation(fields: [user_id], references: [user_id])
   product    product    @relation(fields: [product_id], references: [product_id])
   size_stock size_stock @relation(fields: [size_stock_id], references: [size_stock_id])
-  payment    payment?  
+  payment    payment?
 }
 
 model payment {
-  payment_id        Int       @id @default(autoincrement())
-  user_id           String    @db.Uuid
-  checkout_item_id  Int       @unique
-  payment_intent_id String    @db.VarChar(100)
-  net_price         Decimal   @db.Decimal(10, 2)
-  payment_method    String    @db.VarChar(100)
-  payment_status    String    @db.VarChar(100)
-  created_at        DateTime  @default(now())
-  updated_at        DateTime  @updatedAt
+  payment_id        Int      @id @default(autoincrement())
+  user_id           String   @db.Uuid
+  checkout_item_id  Int      @unique
+  payment_intent_id String   @db.VarChar(100)
+  net_price         Decimal  @db.Decimal(10, 2)
+  payment_method    String   @db.VarChar(100)
+  payment_status    String   @db.VarChar(100)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
 
-  user         user         @relation(fields: [user_id], references: [user_id])
-  checkout_item   checkout_item @relation(fields: [checkout_item_id], references: [checkout_item_id])
-  order order?
+  user          user          @relation(fields: [user_id], references: [user_id])
+  checkout_item checkout_item @relation(fields: [checkout_item_id], references: [checkout_item_id])
+  order         order?
 }
 
 model order {
@@ -261,7 +260,7 @@ model order {
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
 
-  payment payment @relation(fields: [payment_id], references: [payment_id])
+  payment  payment   @relation(fields: [payment_id], references: [payment_id])
   delivery delivery?
 }
 
@@ -274,6 +273,6 @@ model delivery {
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
 
-  order                     order                     @relation(fields: [order_id], references: [order_id])
-  admin_delivery_control    admin_delivery_control[]
+  order                  order                    @relation(fields: [order_id], references: [order_id])
+  admin_delivery_control admin_delivery_control[]
 }

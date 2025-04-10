@@ -6,12 +6,12 @@ interface MobileSidebarProps {
   className?: string;
 }
 
-export default function MobileSidebar({ isOpen, toggleSidebar, className }: MobileSidebarProps) {
+export default function MobileSidebar({ isOpen, toggleSidebar }: MobileSidebarProps) {
   return (
     <>
       {/* Hamburger Button */}
       <button
-        className="fixed top-4 right-4 z-50 p-2 transition-transform duration-200 active:scale-90 lg:hidden"
+        className="fixed top-4 right-4 z-100 p-2 transition-transform duration-200 active:scale-90 lg:hidden"
         onClick={toggleSidebar}
       >
         <div className="relative h-8 w-8">
@@ -49,7 +49,7 @@ export default function MobileSidebar({ isOpen, toggleSidebar, className }: Mobi
       <div
         className={`fixed top-0 right-0 h-full w-72 transform bg-white shadow-lg dark:bg-gray-700 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
-        } z-10 transition-transform duration-300 ease-in-out`}
+        } z-40 transition-transform duration-300 ease-in-out`}
       >
         {/* เมนูภายใน Sidebar */}
         <nav className="mt-12 flex flex-col space-y-4 p-6">

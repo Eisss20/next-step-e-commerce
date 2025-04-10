@@ -12,7 +12,7 @@ export default function UserSidebar() {
   return (
     <>
       {/* Mobile Sidebar */}
-      <MobileSidebar className="lg:hidden" isOpen={isOpen} toggleSidebar={toggleSidebar} />
+      <MobileSidebar className="lg:hidden " isOpen={isOpen} toggleSidebar={toggleSidebar} />
 
       {/* Sidebar */}
       <aside></aside>
