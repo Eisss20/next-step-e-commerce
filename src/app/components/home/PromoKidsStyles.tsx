@@ -19,10 +19,10 @@ export default function PromoKidsStyles() {
             transition={{ duration: 1 }}
             className="pl-5 lg:pl-10 space-y-3 z-10 lg:space-y-5 lg:pt-12"
           >
-          <h1 className="text-black drop-shadow-sm text-4xl font-bold lg:text-8xl">20% Off <br /> Kids Styles</h1>
-          <div className="space-y-3 lg:space-y-5"> 
+          <h1 className="text-black pt-5 drop-shadow-sm text-4xl md:text-7xl  font-bold lg:text-8xl">20% Off <br /> Kids Styles</h1>
+          <div className="space-y-3 lg:space-y-5 md:space-y-16 "> 
             <p className="text-black text-xl">Exclusive, one-time offer</p>
-            <ButtonMain type="primary" onClick={() => {}}>SHOW NOW</ButtonMain>
+            <ButtonMain type="primary" onClick={() => {}}>SHOP NOW</ButtonMain>
           </div>
         </motion.article>
 
