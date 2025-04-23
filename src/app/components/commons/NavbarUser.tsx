@@ -9,6 +9,7 @@ import { GoPerson } from 'react-icons/go';
 import CartButton from '../cart/CartButton';
 import SlideText from '../ui/SlideText';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 // กำหนด interface สำหรับรายการสินค้าในแต่ละ category
 // Define interface for product items in each category
@@ -40,6 +41,8 @@ interface CategoryProducts {
 }
 
 export default function NavbarUser() {
+  const router = useRouter();
+
   // สถานะสำหรับเก็บ category ที่กำลัง active
   // State for storing active category
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
@@ -72,13 +75,20 @@ export default function NavbarUser() {
     }, 100);
   };
 
+  // ฟังก์ชันสำหรับนำทางไปยัง ProductsPage เมื่อคลิกที่เมนูหลัก
+  // Function to navigate to ProductsPage when clicking on main menu
+  const handleMainMenuClick = (label: string) => {
+    const mainCategory = label.toLowerCase();
+    router.push(`/products?mainCategory=${mainCategory}`);
+  };
+
   // รายการเมนูหลัก
   // Main menu items
   const menuItems = [
-    { id: 1, label: 'NEW', route: '#' },
-    { id: 2, label: 'MEN', route: '#' },
-    { id: 3, label: 'WOMEN', route: '#' },
-    { id: 4, label: 'KIDS', route: '#' },
+    { id: 1, label: 'NEW', category: 'new' },
+    { id: 2, label: 'MEN', category: 'men' },
+    { id: 3, label: 'WOMEN', category: 'women' },
+    { id: 4, label: 'KIDS', category: 'kids' },
   ];
 
   // รายการ action items (ปุ่มด้านขวา)
@@ -89,36 +99,54 @@ export default function NavbarUser() {
     { id: 'heart', icon: <PiHeartFill className="h-6 w-6" />, type: 'link', route: '#' },
   ];
 
-  // รายการเมนูย่อยสำหรับแต่ละหมวดหมู่
-  // Submenu options for each category
+  // รายการเมนูย่อยสำหรับแต่ละหมวดหมู่ พร้อมเส้นทางที่ถูกต้อง
+  // Submenu options for each category with proper routes
   const subMenuOptions: SubMenuOptions = {
     1: [
-      { label: 'View all product', route: '#' },
-      { label: 'Sale', route: '#' },
-      { label: 'Best Sellers', route: '#' },
-      { label: 'Limited Editions', route: '#' },
-      { label: 'Performance Series', route: '#' },
+      { label: 'View all product', route: '/products?mainCategory=new' },
+      { label: 'Sale', route: '/products?mainCategory=new&category=Sale' },
+      { label: 'Best Sellers', route: '/products?mainCategory=new&category=Best%20Sellers' },
+      { label: 'Limited Editions', route: '/products?mainCategory=new&category=Limited%20Edition' },
+      {
+        label: 'Performance Series',
+        route: '/products?mainCategory=new&category=Performance%20Series',
+      },
     ],
     2: [
-      { label: 'View all product', route: '#' },
-      { label: 'Sale', route: '#' },
-      { label: 'Best Sellers', route: '#' },
-      { label: 'Limited Editions', route: '#' },
-      { label: 'Performance Series', route: '#' },
+      { label: 'View all product', route: '/products?mainCategory=men' },
+      { label: 'Sale', route: '/products?mainCategory=men&category=Sale' },
+      { label: 'Best Sellers', route: '/products?mainCategory=men&category=Best%20Sellers' },
+      { label: 'Limited Editions', route: '/products?mainCategory=men&category=Limited%20Edition' },
+      {
+        label: 'Performance Series',
+        route: '/products?mainCategory=men&category=Performance%20Series',
+      },
     ],
     3: [
-      { label: 'View all product', route: '#' },
-      { label: 'Sale', route: '#' },
-      { label: 'Best Sellers', route: '#' },
-      { label: 'Limited Editions', route: '#' },
-      { label: 'Performance Series', route: '#' },
+      { label: 'View all product', route: '/products?mainCategory=women' },
+      { label: 'Sale', route: '/products?mainCategory=women&category=Sale' },
+      { label: 'Best Sellers', route: '/products?mainCategory=women&category=Best%20Sellers' },
+      {
+        label: 'Limited Editions',
+        route: '/products?mainCategory=women&category=Limited%20Edition',
+      },
+      {
+        label: 'Performance Series',
+        route: '/products?mainCategory=women&category=Performance%20Series',
+      },
     ],
     4: [
-      { label: 'View all product', route: '#' },
-      { label: 'Sale', route: '#' },
-      { label: 'Best Sellers', route: '#' },
-      { label: 'Limited Editions', route: '#' },
-      { label: 'Performance Series', route: '#' },
+      { label: 'View all product', route: '/products?mainCategory=kids' },
+      { label: 'Sale', route: '/products?mainCategory=kids&category=Sale' },
+      { label: 'Best Sellers', route: '/products?mainCategory=kids&category=Best%20Sellers' },
+      {
+        label: 'Limited Editions',
+        route: '/products?mainCategory=kids&category=Limited%20Edition',
+      },
+      {
+        label: 'Performance Series',
+        route: '/products?mainCategory=kids&category=Performance%20Series',
+      },
     ],
   };
 
@@ -132,35 +160,35 @@ export default function NavbarUser() {
         name: 'Latest Sneaker 2024',
         price: 129.99,
         image: '/images/content-nav/AIR+MAX+DN8-4.png',
-        route: '#',
+        route: '/products/1',
       },
       {
         id: 2,
         name: 'Air Max DN8',
         price: 149.99,
         image: '/images/content-nav/AIR+MAX+DN8-5.png',
-        route: '#',
+        route: '/products/2',
       },
       {
         id: 3,
         name: 'Air Max DN8 AMD',
         price: 159.99,
         image: '/images/content-nav/AIRMAXDN8AMD-1.png',
-        route: '#',
+        route: '/products/3',
       },
       {
         id: 4,
         name: 'Air Max DN8 AMD Pro',
         price: 179.99,
         image: '/images/content-nav/AIRMAXDN8AMD-2.png',
-        route: '#',
+        route: '/products/4',
       },
       {
         id: 5,
         name: 'Nike Vomero',
         price: 139.99,
         image: '/images/content-nav/NIKE+VOMERO-2.png',
-        route: '#',
+        route: '/products/5',
       },
     ],
     2: [
@@ -170,35 +198,35 @@ export default function NavbarUser() {
         name: 'Classic Oxford Shirt',
         price: 79.99,
         image: '/images/content-nav/men-1.png',
-        route: '#',
+        route: '/products/6',
       },
       {
         id: 2,
         name: 'Business Suit',
         price: 399.99,
         image: '/images/content-nav/men-2.png',
-        route: '#',
+        route: '/products/7',
       },
       {
         id: 3,
         name: 'Casual Denim',
         price: 89.99,
         image: '/images/content-nav/men-3.png',
-        route: '#',
+        route: '/products/8',
       },
       {
         id: 4,
         name: 'Sport Jacket',
         price: 129.99,
         image: '/images/content-nav/men-4.png',
-        route: '#',
+        route: '/products/9',
       },
       {
         id: 5,
         name: 'Running Shoes',
         price: 119.99,
         image: '/images/content-nav/men-5.png',
-        route: '#',
+        route: '/products/10',
       },
     ],
     3: [
@@ -208,35 +236,35 @@ export default function NavbarUser() {
         name: 'Evening Dress',
         price: 199.99,
         image: '/images/content-nav/woman-1.png',
-        route: '#',
+        route: '/products/11',
       },
       {
         id: 2,
         name: 'Designer Handbag',
         price: 299.99,
         image: '/images/content-nav/woman-2.png',
-        route: '#',
+        route: '/products/12',
       },
       {
         id: 3,
         name: 'Summer Blouse',
         price: 69.99,
         image: '/images/content-nav/woman-3.png',
-        route: '#',
+        route: '/products/13',
       },
       {
         id: 4,
         name: 'Yoga Set',
         price: 89.99,
         image: '/images/content-nav/woman-4.png',
-        route: '#',
+        route: '/products/14',
       },
       {
         id: 5,
         name: 'High Heels',
         price: 159.99,
         image: '/images/content-nav/woman-5.png',
-        route: '#',
+        route: '/products/15',
       },
     ],
     4: [
@@ -246,35 +274,35 @@ export default function NavbarUser() {
         name: 'School Collection',
         price: 69.99,
         image: '/images/content-nav/kid-1.png',
-        route: '#',
+        route: '/products/16',
       },
       {
         id: 2,
         name: 'Play Set',
         price: 49.99,
         image: '/images/content-nav/kid-2.png',
-        route: '#',
+        route: '/products/17',
       },
       {
         id: 3,
         name: 'Sport Gear',
         price: 79.99,
         image: '/images/content-nav/kid-3.png',
-        route: '#',
+        route: '/products/18',
       },
       {
         id: 4,
         name: 'Winter Wear',
         price: 89.99,
         image: '/images/content-nav/kid-4.png',
-        route: '#',
+        route: '/products/19',
       },
       {
         id: 5,
         name: 'Casual Shoes',
         price: 59.99,
         image: '/images/content-nav/kid-5.png',
-        route: '#',
+        route: '/products/20',
       },
     ],
   };
@@ -300,10 +328,11 @@ export default function NavbarUser() {
                   key={item.id}
                   whileHover={{ scale: 1.1 }}
                   transition={{ duration: 0.3 }}
-                  className="flex justify-center rounded-2xl p-2 font-medium whitespace-nowrap transition-all duration-300 hover:bg-gray-200 hover:text-amber-600"
+                  className="flex cursor-pointer justify-center rounded-2xl p-2 font-medium whitespace-nowrap transition-all duration-300 hover:bg-gray-200 hover:text-amber-600"
                   onMouseEnter={() => handleCategoryHover(item.id)}
+                  onClick={() => handleMainMenuClick(item.category)}
                 >
-                  <Link href={item.route}>{item.label}</Link>
+                  <span>{item.label}</span>
                 </motion.div>
               ))}
             </div>
