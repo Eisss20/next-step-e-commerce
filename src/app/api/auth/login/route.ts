@@ -13,11 +13,11 @@ import { supabase } from "@/app/utils/supabaseClient";
 
 export async function POST(request: Request) {
     try {
-        const { email, password } = await request.json();
+        const { email, password,display_name } = await request.json();
         
-        if (!email || !password) {
+        if (!email || !password || !display_name) {
             return NextResponse.json(
-                { error: "Email และ password จำเป็นต้องระบุ" }, 
+                { error: "Email และ password และ Username จำเป็นต้องระบุ" }, 
                 { status: 400 }
             );
         }

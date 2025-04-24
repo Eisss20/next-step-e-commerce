@@ -51,7 +51,7 @@ export async function POST(request: Request) {
             password,
             options: {
                 data: {
-                    username: username || email.split('@')[0], // ใช้ส่วนแรกของอีเมลถ้าไม่มี username
+                    display_name: username || email.split('@')[0], // ใช้ส่วนแรกของอีเมลถ้าไม่มี username
                 }
             }
         });

@@ -5,6 +5,7 @@ import NavbarUser from './components/commons/NavbarUser';
 import UserSidebar from './components/commons/UserSidebar';
 import FooterBar from './components/commons/FooterBar';
 
+
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
