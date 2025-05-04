@@ -1,43 +1,50 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
+import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import HeroSection from './components/home/HeroSection';
 import BestSellersSection from './components/home/BestSellersSection';
 import PromoKidsStyles from './components/home/PromoKidsStyles';
 import ShopCollection from './components/home/ShopCollection';
 import CommitSection from './components/home/CommitSection';
-import { useEffect, useRef } from 'react';
-import { IoIosArrowUp } from 'react-icons/io';
 
 export default function Home() {
   const sections = useRef<(HTMLElement | null)[]>([]);
+  const [currentSection, setCurrentSection] = useState(0); // <-- เพิ่ม useState เก็บ section ปัจจุบัน
 
   const setRef = (index: number) => (el: HTMLElement | null) => {
     sections.current[index] = el;
   };
 
-  const scrollToTop = () => {
-    sections.current[0]?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToNext = () => {
+    if (currentSection < sections.current.length - 1) {
+      const nextSection = currentSection + 1;
+      sections.current[nextSection]?.scrollIntoView({ behavior: 'smooth' });
+      setCurrentSection(nextSection);
+    }
+  };
+
+  const scrollToPrev = () => {
+    if (currentSection > 0) {
+      const prevSection = currentSection - 1;
+      sections.current[prevSection]?.scrollIntoView({ behavior: 'smooth' });
+      setCurrentSection(prevSection);
+    }
   };
 
   useEffect(() => {
-    let currentSection = 0;
-    const totalSections = sections.current.length;
-
     const handleScroll = (event: WheelEvent) => {
       const scrollDirection = event.deltaY;
-
-      if (scrollDirection > 0 && currentSection < totalSections - 1) {
-        currentSection++;
-        sections.current[currentSection]?.scrollIntoView({ behavior: 'smooth' });
-      } else if (scrollDirection < 0 && currentSection > 0) {
-        currentSection--;
-        sections.current[currentSection]?.scrollIntoView({ behavior: 'smooth' });
+      if (scrollDirection > 0) {
+        scrollToNext();
+      } else if (scrollDirection < 0) {
+        scrollToPrev();
       }
     };
 
     window.addEventListener('wheel', handleScroll);
     return () => window.removeEventListener('wheel', handleScroll);
-  }, []);
+  }, [currentSection]); // depend on currentSection เพื่อให้ทำงานถูกต้อง
 
   return (
     <>
@@ -58,11 +65,19 @@ export default function Home() {
       </div>
 
       <button
-        onClick={scrollToTop}
-        className="fixed right-8 bottom-8 z-[9999] cursor-pointer rounded-full bg-gray-400 p-3 text-white shadow-lg transition-all duration-300 hover:bg-gray-800"
-        aria-label="Scroll to top"
+        onClick={scrollToPrev}
+        className="fixed right-8 bottom-24 z-[9999] cursor-pointer rounded-full bg-gray-400 p-3 text-white shadow-lg transition-all duration-300 hover:bg-gray-800"
+        aria-label="Scroll to previous section"
       >
         <IoIosArrowUp size={24} />
+      </button>
+
+      <button
+        onClick={scrollToNext}
+        className="fixed right-8 bottom-8 z-[9999] cursor-pointer rounded-full bg-gray-400 p-3 text-white shadow-lg transition-all duration-300 hover:bg-gray-800"
+        aria-label="Scroll to next section"
+      >
+        <IoIosArrowDown size={24} />
       </button>
     </>
   );

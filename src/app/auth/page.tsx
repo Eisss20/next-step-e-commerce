@@ -1,23 +1,42 @@
+'use client'
 import { FcGoogle } from 'react-icons/fc';
 import Link from 'next/link';
 import { FaFacebookSquare } from 'react-icons/fa';
-import ButtonMain from '../components/ui/ButtonMain';
+
+import { useState } from 'react';
 
 export default function AuthPage() {
+
+  const [isRegister, setIsRegister] = useState(false);
+
+  const handleRegister = () => {
+    setIsRegister(!isRegister);
+  }
+
+
   return (
     <>
       <main className="flex min-h-screen flex-col items-center justify-center bg-[url('/images/auth/authwallpaper.avif')] bg-cover bg-center">
         <section className="lg:border-block flex h-[30rem] w-[20rem] flex-col items-center justify-center gap-10 rounded-xl lg:h-[35rem] lg:w-[30rem] lg:border-1 lg:border-white lg:bg-white/50">
           <h1 className="text-shadow-[0_0_3px_#000,_0_0_5px_#000] text-shadow-lg drop-shadow-sm text-6xl font-bold text-white">
-            Login
+            {isRegister ? 'Register' : 'Login'}   
           </h1>
           <form className="flex flex-col items-center justify-center gap-5">
             <input
-              type="text"
+              type="email"
               required
-              placeholder="username or email"
+              placeholder="email"
               className="w-72 rounded-2xl border-2 border-gray-100 bg-white p-2  hover:border-amber-600 focus:outline-none"
             />
+
+            {isRegister && (
+              <input
+                type="text"
+                required
+                placeholder="username"
+                className="w-72 rounded-2xl border-2 border-gray-100 bg-white p-2  hover:border-amber-600 focus:outline-none"
+              />
+            )}
             <input
               type="password"
               required
@@ -46,18 +65,31 @@ export default function AuthPage() {
           </button> */}
           <button
             type="submit"
-            className="hover:shadow-3xl transform cursor-pointer rounded-full border-b-1 border-amber-800 bg-amber-600  px-8 py-3 text-white shadow-lg drop-shadow-xl transition-transform duration-200 hover:scale-105 hover:bg-amber-700  active:bg-amber-800"
+            className="hover:shadow-3xl transform cursor-pointer rounded-full border-b-1 border-amber-800 bg-amber-600  px-30 py-3 text-white shadow-lg drop-shadow-xl transition-transform duration-200 hover:scale-105 hover:bg-amber-700  active:bg-amber-800"
           >
             Login
             </button>
-            </section>
+          </section>
+         {!isRegister && (
           <p className="text-sm text-gray-500">
             Don't have an account?
-            <Link href="#" className="ml-2 hover:text-amber-600 transition-transform hover:underline duration-200 text-amber-800">
-              Sign up
-            </Link>
-          </p>
+            <button onClick={handleRegister} className="ml-2 hover:text-amber-600 transition-transform hover:underline duration-200 text-amber-800">
+              {isRegister ? 'Login' : 'Sign up'}
+            </button>
+            </p>
+          )}
+          {isRegister && (
+            <p className="text-sm text-gray-500">
+              Already have an account?
+              <button onClick={handleRegister} className="ml-2 hover:text-amber-600 transition-transform hover:underline duration-200 text-amber-800">
+                {isRegister ? 'Login' : 'Sign up'}
+              </button>
+            </p>
+          )}
         </section>
+
+
+        
       </main>
     </>
   );

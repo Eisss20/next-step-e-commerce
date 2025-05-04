@@ -1,262 +1,64 @@
-'use client';
+'use client'
+import { FcGoogle } from 'react-icons/fc';
+import Link from 'next/link';
+import { FaFacebookSquare } from 'react-icons/fa';
 
-import { useState, useEffect } from 'react';
-import { supabase } from '@/app/utils/supabaseClient';
-import { Session } from '@supabase/supabase-js';
-
-export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
-  const [userData, setUserData] = useState<any>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-
-  // ตรวจสอบ session เมื่อโหลดหน้าเว็บ
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      setSession(data.session);
-
-      if (data.session) {
-        setMessage('คุณเข้าสู่ระบบอยู่แล้ว');
-        setAccessToken(data.session.access_token);
-        testGetUserAPI();
-      }
-    };
-
-    checkSession();
-
-    // ลงทะเบียน listener สำหรับการเปลี่ยนแปลง auth state
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, newSession) => {
-      setSession(newSession);
-      if (newSession) {
-        setMessage('สถานะการเข้าสู่ระบบเปลี่ยนแปลง: ' + event);
-        setAccessToken(newSession.access_token);
-      } else {
-        setAccessToken(null);
-      }
-    });
-
-    return () => {
-      // ยกเลิก listener เมื่อ component unmount
-      if (authListener && authListener.subscription) {
-        authListener.subscription.unsubscribe();
-      }
-    };
-  }, []);
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setMessage('กำลังเข้าสู่ระบบ...');
-
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        setMessage(`เข้าสู่ระบบไม่สำเร็จ: ${error.message}`);
-        return;
-      }
-
-      setSession(data.session);
-      setAccessToken(data.session?.access_token || null);
-      setMessage('เข้าสู่ระบบสำเร็จ!');
-
-      // รอให้ session ถูกเซ็ตก่อนเรียก API
-      setTimeout(() => {
-        testGetUserAPI();
-      }, 500);
-    } catch (error: any) {
-      setMessage(`เกิดข้อผิดพลาด: ${error.message}`);
-    }
-  };
-
-  const testGetUserAPI = async () => {
-    try {
-      // ใช้ credentials: 'include' เพื่อส่ง cookies ไปด้วย
-      const response = await fetch('/api/auth/getuser', {
-        credentials: 'include',
-        headers: {
-          'Cache-Control': 'no-cache',
-        },
-      });
-
-      const data = await response.json();
-
-      // ถ้ามี error ให้ลองใช้ token แทน
-      if (data.error && accessToken) {
-        console.log('Session cookie ไม่ทำงาน ลองใช้ token แทน...');
-        return testGetUserWithToken();
-      }
-
-      setUserData(data);
-      console.log('ข้อมูลจาก API (ใช้ session cookie):', data);
-    } catch (error: any) {
-      console.error('เกิดข้อผิดพลาดในการเรียก API:', error);
-      setMessage(`เกิดข้อผิดพลาดในการเรียก API: ${error.message}`);
-
-      // ถ้าเกิด error ให้ลองใช้ token แทน
-      if (accessToken) {
-        console.log('ลองใช้ token แทน...');
-        testGetUserWithToken();
-      }
-    }
-  };
-
-  const testGetUserWithToken = async () => {
-    try {
-      if (!accessToken) {
-        setMessage('ไม่มี Access Token กรุณาเข้าสู่ระบบอีกครั้ง');
-        return;
-      }
-
-      const response = await fetch('/api/auth/getuser', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ accessToken }),
-      });
-
-      const data = await response.json();
-      setUserData(data);
-      console.log('ข้อมูลจาก API (ใช้ token):', data);
-    } catch (error: any) {
-      console.error('เกิดข้อผิดพลาดในการเรียก API ด้วย token:', error);
-      setMessage(`เกิดข้อผิดพลาด: ${error.message}`);
-
-      // ถ้าเกิด error ให้ลองใช้ email แทน (สำหรับทดสอบเท่านั้น)
-      testGetUserWithEmail();
-    }
-  };
-
-  const testGetUserWithEmail = async () => {
-    try {
-      if (!email && session?.user?.email) {
-        // ถ้าไม่มี email ในฟอร์ม แต่มีใน session ให้ใช้จาก session
-        const userEmail = session.user.email;
-        console.log('ใช้อีเมลจาก session:', userEmail);
-
-        const response = await fetch('/api/auth/getuser', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email: userEmail }),
-        });
-
-        const data = await response.json();
-        setUserData(data);
-        console.log('ข้อมูลจาก API (ใช้ email จาก session):', data);
-      } else if (email) {
-        // ถ้ามี email ในฟอร์ม ให้ใช้จากฟอร์ม
-        const response = await fetch('/api/auth/getuser', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email }),
-        });
-
-        const data = await response.json();
-        setUserData(data);
-        console.log('ข้อมูลจาก API (ใช้ email จากฟอร์ม):', data);
-      } else {
-        console.error('ไม่พบอีเมล์สำหรับทดสอบ');
-        setMessage('ไม่พบอีเมล์สำหรับทดสอบ กรุณากรอกอีเมล์ในฟอร์ม');
-      }
-    } catch (error: any) {
-      console.error('เกิดข้อผิดพลาดในการเรียก API ด้วย email:', error);
-      setMessage(`เกิดข้อผิดพลาด: ${error.message}`);
-    }
-  };
-
-  const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      setMessage(`ออกจากระบบไม่สำเร็จ: ${error.message}`);
-    } else {
-      setMessage('ออกจากระบบสำเร็จ');
-      setUserData(null);
-      setSession(null);
-      setAccessToken(null);
-    }
-  };
-
+export default function AuthPage() {
   return (
-    <div className="mx-auto mt-10 max-w-md rounded-lg bg-white p-6 shadow-md">
-      <h1 className="mb-6 text-2xl font-semibold">เข้าสู่ระบบเพื่อทดสอบ API</h1>
-
-      {!session ? (
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium">
-              อีเมล
-            </label>
+    <>
+      <main className="flex min-h-screen flex-col items-center justify-center bg-[url('/images/auth/authwallpaper.avif')] bg-cover bg-center">
+        <section className="lg:border-block flex h-[30rem] w-[20rem] flex-col items-center justify-center gap-10 rounded-xl lg:h-[35rem] lg:w-[30rem] lg:border-1 lg:border-white lg:bg-white/50">
+          <h1 className="text-shadow-[0_0_3px_#000,_0_0_5px_#000] text-shadow-lg drop-shadow-sm text-6xl font-bold text-white">
+            Login
+          </h1>
+          <form className="flex flex-col items-center justify-center gap-5">
             <input
-              id="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm"
               required
+              placeholder="email"
+              className="w-72 rounded-2xl border-2 border-gray-100 bg-white p-2 hover:border-amber-600 focus:outline-none"
             />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium">
-              รหัสผ่าน
-            </label>
             <input
-              id="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm"
               required
+              placeholder="password"
+              className="w-72 rounded-2xl border-2 border-gray-100 bg-white p-2 hover:border-amber-600 focus:outline-none"
             />
+          </form>
+          <div className="flex flex-row items-center justify-center gap-10">
+            <Link
+              href="#"
+              className="flex h-10 w-10 flex-row items-center bg-white justify-center hover:scale-110 transition-transform duration-200 gap-2 rounded-full border-1 border-gray-200 shadow"
+            >
+              <FcGoogle size={40} />
+            </Link>
+
+            <Link
+              href="#"
+              className="flex flex-col items-center justify-center bg-white hover:scale-110 transition-transform duration-200 gap-2 rounded-md text-[#0766FE] shadow shadow-blue-500/50"
+            >
+              <FaFacebookSquare size={40} />
+            </Link>
           </div>
-
-          <button
-            type="submit"
-            className="w-full rounded-md border border-transparent bg-blue-600 px-4 py-2 text-white shadow-sm hover:bg-blue-700"
-          >
-            เข้าสู่ระบบ
-          </button>
-        </form>
-      ) : (
-        <button
-          onClick={handleLogout}
-          className="w-full rounded-md border border-transparent bg-red-600 px-4 py-2 text-white shadow-sm hover:bg-red-700"
-        >
-          ออกจากระบบ
-        </button>
-      )}
-
-      {message && (
-        <div className="mt-4 rounded-md bg-gray-100 p-3">
-          <p>{message}</p>
-        </div>
-      )}
-
-      {userData && (
-        <div className="mt-4 rounded-md bg-gray-100 p-3">
-          <h2 className="mb-2 text-lg font-semibold">ผลลัพธ์จาก API:</h2>
-          <pre className="overflow-auto text-xs">{JSON.stringify(userData, null, 2)}</pre>
-        </div>
-      )}
-
-      <div className="mt-4">
-        <button
-          onClick={testGetUserAPI}
-          className="w-full rounded-md border border-transparent bg-green-600 px-4 py-2 text-white shadow-sm hover:bg-green-700"
-        >
-          ทดสอบเรียก API
-        </button>
-      </div>
-    </div>
+          <section className="flex flex-row items-center justify-center gap-2">
+            <button
+              type="submit"
+              className="hover:shadow-3xl transform cursor-pointer rounded-full border-b-1 border-amber-800 bg-amber-600 px-30 py-3 text-white shadow-lg drop-shadow-xl transition-transform duration-200 hover:scale-105 hover:bg-amber-700 active:bg-amber-800"
+            >
+              Login
+            </button>
+          </section>
+          <p className="text-sm text-gray-500">
+            Don't have an account?
+            <Link
+              href="/auth/register"
+              className="ml-2 hover:text-amber-600 transition-transform hover:underline duration-200 text-amber-800"
+            >
+              Sign up
+            </Link>
+          </p>
+        </section>
+      </main>
+    </>
   );
 }
