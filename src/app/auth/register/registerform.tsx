@@ -9,6 +9,11 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 export default function RegisterForm() {
   const [email, setEmail] = useState('');
@@ -16,6 +21,13 @@ export default function RegisterForm() {
   const [password, setPassword] = useState('');
   const [name, setname] = useState('');
   const [continueButton, setContinueButton] = useState(false);
+  const [postcode, setPostcode] = useState('');
+  const [country, setCountry] = useState('');
+  const [city, setCity] = useState('');
+
+  const handleChange = (event: any) => {
+    setPostcode(event.target.value);
+  };
 
   const handleContinue = async () => {
     setContinueButton(true);
@@ -24,7 +36,7 @@ export default function RegisterForm() {
     setContinueButton(false);
   };
 
-  const handleSubmit = async () => {  
+  const handleSubmit = async () => {
     console.log('submit');
   };
   // 1 ต้องใส่ข้อมูลทั้งหมด
@@ -37,10 +49,17 @@ export default function RegisterForm() {
   // 8 จะมีปุ่มสำหรับกลับไปหน้าก่อนหน้า
   // 9 มีปุ่มsubmit สำหรับส่งข้อมูลใน
 
-
-
   const inputStyle =
     'w-full rounded-2xl border-1 border-gray-300 bg-white p-2 hover:border-amber-600 focus:outline-none';
+
+  const selectStyle = `${inputStyle} cursor-pointer [&>option]:py-2 [&>option]:px-4 [&>option]:cursor-pointer [&>option]:bg-white [&>option:checked]:bg-blue-500 [&>option:checked]:text-white`;
+
+  // Add styles to force dropdown direction
+  const selectWrapperStyle = `
+    ${selectStyle}
+    [&_select]:absolute [&_select]:bottom-full
+    [&_option]:absolute [&_option]:top-full
+  `;
 
   return (
     <>
@@ -191,24 +210,168 @@ export default function RegisterForm() {
             </div>
 
             <div className="flex w-full flex-col">
-              <label htmlFor="postcode" className="pl-1 text-[12px] text-gray-500">
-                Postcode
-              </label>
-              <input type="text" className={inputStyle} placeholder="Postcode" />
+              <Box sx={{ minWidth: 120 }}>
+                <FormControl fullWidth>
+                  <InputLabel id="country-select-label">Country</InputLabel>
+                  <Select
+                    labelId="country-select-label"
+                    id="country-select"
+                    value={country}
+                    label="Country"
+                    onChange={(event: SelectChangeEvent) => setCountry(event.target.value)}
+                    className={inputStyle}
+                    sx={{
+                      width: '100%',
+                      height: '3rem',
+                      borderRadius: '1rem',
+                      padding: '0.5rem',
+                      border: '1px solid #ccc',
+                      backgroundColor: '#fff',
+                      color: '#000',
+                      fontSize: '1rem',
+                      marginTop: '3px',
+                    }}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200,
+                        },
+                      },
+                      autoFocus: true,
+                      disableAutoFocusItem: true,
+                      onKeyDown: (e) => {
+                        if (e.key === 'Backspace') {
+                          e.stopPropagation();
+                        }
+                      },
+                    }}
+                  >
+                    <MenuItem value="">
+                      <em>Type to search country...</em>
+                    </MenuItem>
+                    <MenuItem value="thailand">Thailand</MenuItem>
+                    <MenuItem value="usa">United States</MenuItem>
+                    <MenuItem value="uk">United Kingdom</MenuItem>
+                    <MenuItem value="japan">Japan</MenuItem>
+                    <MenuItem value="china">China</MenuItem>
+                    <MenuItem value="singapore">Singapore</MenuItem>
+                    <MenuItem value="malaysia">Malaysia</MenuItem>
+                    <MenuItem value="vietnam">Vietnam</MenuItem>
+                    <MenuItem value="indonesia">Indonesia</MenuItem>
+                    <MenuItem value="philippines">Philippines</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
             </div>
 
             <div className="flex w-full flex-col">
-              <label htmlFor="city" className="pl-1 text-[12px] text-gray-500">
-                City
-              </label>
-              <input type="text" className={inputStyle} placeholder="City" />
+              <Box sx={{ minWidth: 120 }}>
+                <FormControl fullWidth>
+                  <InputLabel id="city-select-label">City</InputLabel>
+                  <Select
+                    labelId="city-select-label"
+                    id="city-select"
+                    value={city}
+                    label="City"
+                    onChange={(event: SelectChangeEvent) => setCity(event.target.value)}
+                    className={inputStyle}
+                    sx={{
+                      width: '100%',
+                      height: '3rem',
+                      borderRadius: '1rem',
+                      padding: '0.5rem',
+                      border: '1px solid #ccc',
+                      backgroundColor: '#fff',
+                      color: '#000',
+                      fontSize: '1rem',
+                      marginTop: '3px',
+                    }}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200,
+                        },
+                      },
+                      autoFocus: true,
+                      disableAutoFocusItem: true,
+                      onKeyDown: (e) => {
+                        if (e.key === 'Backspace') {
+                          e.stopPropagation();
+                        }
+                      },
+                    }}
+                  >
+                    <MenuItem value="">
+                      <em>Type to search city...</em>
+                    </MenuItem>
+                    <MenuItem value="bangkok">Bangkok</MenuItem>
+                    <MenuItem value="chiangmai">Chiang Mai</MenuItem>
+                    <MenuItem value="phuket">Phuket</MenuItem>
+                    <MenuItem value="pattaya">Pattaya</MenuItem>
+                    <MenuItem value="hatyai">Hat Yai</MenuItem>
+                    <MenuItem value="udonthani">Udon Thani</MenuItem>
+                    <MenuItem value="khonkaen">Khon Kaen</MenuItem>
+                    <MenuItem value="nakhonratchasima">Nakhon Ratchasima</MenuItem>
+                    <MenuItem value="suratthani">Surat Thani</MenuItem>
+                    <MenuItem value="ubonratchathani">Ubon Ratchathani</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
             </div>
 
             <div className="flex w-full flex-col">
-              <label htmlFor="country" className="pl-1 text-[12px] text-gray-500">
-                Country
-              </label>
-              <input type="text" className={inputStyle} placeholder="Country" />
+              <Box sx={{ minWidth: 120 }}>
+                <FormControl fullWidth>
+                  <InputLabel id="postcode-select-label">Postcode</InputLabel>
+                  <Select
+                    labelId="postcode-select-label"
+                    id="postcode-select"
+                    value={postcode}
+                    label="Postcode"
+                    onChange={(event: SelectChangeEvent) => setPostcode(event.target.value)}
+                    className={inputStyle}
+                    sx={{
+                      width: '100%',
+                      height: '3rem',
+                      borderRadius: '1rem',
+                      padding: '0.5rem',
+                      border: '1px solid #ccc',
+                      backgroundColor: '#fff',
+                      color: '#000',
+                      fontSize: '1rem',
+                      marginTop: '3px',
+                    }}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200,
+                        },
+                      },
+                      autoFocus: true,
+                      disableAutoFocusItem: true,
+                      onKeyDown: (e) => {
+                        if (e.key === 'Backspace') {
+                          e.stopPropagation();
+                        }
+                      },
+                    }}
+                  >
+                    <MenuItem value="">
+                      <em>Type to search postcode...</em>
+                    </MenuItem>
+                    <MenuItem value="1">1</MenuItem>
+                    <MenuItem value="2">2</MenuItem>
+                    <MenuItem value="3">3</MenuItem>
+                    <MenuItem value="4">4</MenuItem>
+                    <MenuItem value="5">5</MenuItem>
+                    <MenuItem value="6">6</MenuItem>
+                    <MenuItem value="700">700</MenuItem>
+                    <MenuItem value="720">720</MenuItem>
+                    <MenuItem value="73000">73000</MenuItem>
+                    <MenuItem value="10">10</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
             </div>
 
             <div className="mt-4 flex flex-row items-center justify-center gap-10">
@@ -216,6 +379,7 @@ export default function RegisterForm() {
                 type="button"
                 onClick={handleBack}
                 className="hover:shadow-3xl transform cursor-pointer rounded-full bg-gray-600 px-10 py-3 text-white shadow-lg drop-shadow-xl transition-transform duration-200 hover:scale-105 hover:bg-gray-400 active:bg-gray-800"
+                title="Back to previous step"
               >
                 <IoArrowBack className="h-6 w-6" />
               </button>

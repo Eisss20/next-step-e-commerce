@@ -117,6 +117,7 @@ model address {
   zipcode_id        Int
   telephone_number  String @db.VarChar(15)
 
+  location       location       @relation(fields: [location_id], references: [location_id])
   city           city           @relation(fields: [city_id], references: [city_id])
   province_state province_state @relation(fields: [province_state_id], references: [province_state_id])
   zipcode        zipcode        @relation(fields: [zipcode_id], references: [zipcode_id])
@@ -129,6 +130,7 @@ model location {
   location_id     Int              @id @default(autoincrement())
   location_name   String           @unique
   province_states province_state[]
+  addresses       address[]
 }
 
 model province_state {
