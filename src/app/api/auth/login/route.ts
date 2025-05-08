@@ -1,55 +1,84 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/app/utils/supabaseClient";
+import bcrypt from "bcrypt";
+import { signJWT, verifyJWT } from "@/app/utils/jwtIntial";
+import { PrismaClient } from "@prisma/client";
 
-
+const prisma = new PrismaClient() 
 
 // ขั้นตอนการทำงาน
 // 1. รับข้อมูลจากผู้ใช้
 // 2. ตรวจสอบความถูกต้องของข้อมูล
-// 3. ลงทะเบียนผู้ใช้ใหม่
-// 4. ส่งผลลัพธ์กลับไปยังผู้ใช้
-// endpoint สำหรับการเข้าสู่ระบบ /api/auth/register/login
+// 3. ทำการ bcrypt รหัสผ่าน
+// 4. หากผ่านก็จะสร้าง payload 
+// 5. และสร้าง token และส่งผลลัพธ์กลับไปยังผู้ใช้
+
+interface LoginData {
+    email: string;
+    password: string;
+    username: string;
+}
+
 
 
 export async function POST(request: Request) {
-    try {
-        const { email, password,display_name } = await request.json();
-        
-        if (!email || !password || !display_name) {
-            return NextResponse.json(
-                { error: "Email และ password และ Username จำเป็นต้องระบุ" }, 
-                { status: 400 }
-            );
+
+try {
+
+    const userPassword = await request.json() as LoginData;
+
+    const { email, password, username } = userPassword;
+
+    const user = await prisma.user.findUnique({
+        where: {
+            email: email,
+            username: username,
         }
-        
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
-        
-        if (error) {
-            return NextResponse.json(
-                { error: error.message }, 
-                { status: 401 }
-            );
-        }
-        
-        // ส่งคืนเฉพาะข้อมูลที่จำเป็น
-        return NextResponse.json({
-            user: {
-                id: data.user.id,
-                email: data.user.email,
-                user_metadata: data.user.user_metadata
-            },
-            access_token: data.session.access_token,
-            refresh_token: data.session.refresh_token,
-            expires_at: data.session.expires_at
-        });
-    } catch (error: any) {
-        console.error('Login error:', error);
-        return NextResponse.json(
-            { error: error.message || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ" }, 
-            { status: 500 }
-        );
+    });
+
+    if (!user || !user.password) {
+        return NextResponse.json({ error: "please fill all the fields" }, { status: 401 });
+
     }
+
+    if (!user) {
+        return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+
+      }
+  
+
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+          return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+    }
+    
+
+    const payload = {
+    email: email,
+    username: username,
+    password: password
+    }
+
+    console.log("✅ Payload will be signed:", payload);
+    
+    const token = signJWT(payload, process.env.JWT_SECRET || 'secret');
+
+    console.log(process.env.JWT_SECRET)
+
+    return NextResponse.json({ token, user: { email, username, password } });
+    
+ 
+
+} catch (error: any) {
+
+    console.error('Login error:', error);
+    console.log("Internal server error");
+    console.log(error);
+    return NextResponse.json(
+        { error: error.message || "Internal server error" }, 
+        { status: 500 }
+    );
+}
+
+
+
 }

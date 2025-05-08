@@ -80,7 +80,7 @@ model product_stock {
 // -------------------------------------------------------- user section --------------------------------------------------------------------------
 
 model user {
-  user_id        String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id String @id @default(uuid()) @db.Uuid
   username       String          @unique
   password       String
   email          String          @unique
