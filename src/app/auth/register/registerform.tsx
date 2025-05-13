@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IoArrowBack } from 'react-icons/io5';
 import { motion } from 'framer-motion';
-import { style, tr } from 'motion/react-client';
+import { data, style, tr } from 'motion/react-client';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -21,13 +21,84 @@ export default function RegisterForm() {
   const [password, setPassword] = useState('');
   const [name, setname] = useState('');
   const [continueButton, setContinueButton] = useState(false);
-  const [postcode, setPostcode] = useState('');
-  const [country, setCountry] = useState('');
-  const [city, setCity] = useState('');
 
-  const handleChange = (event: any) => {
-    setPostcode(event.target.value);
+  
+  const [location, setLocation] = useState([])
+  const [selectedLocation, setSelectedLocation] = useState('')
+  
+  const [province, setProvince] = useState([])
+  const [selectedProvince, setSelectedProvince] = useState('')
+  
+
+  const [city, setCity] = useState([])
+  const [selectedCity, setSelectedCity] = useState('')
+
+  const [postcode, setPostcode] = useState([])
+  const [selectedPostcode, setSelectedPostcode] = useState('')
+
+useEffect(() => {
+  const fetchDataLocation = async () => {
+    const response = await fetch('/api/auth/register/getDataLocation');
+    const dataLocation = await response.json();
+    setLocation(dataLocation.data);
+    console.log('RESPONSE:', dataLocation);
   };
+  fetchDataLocation();
+}, [selectedLocation]);
+
+useEffect(() => {
+  const fetchDataProvince = async () => {
+    const response = await fetch(`/api/auth/register/getDataProvince?locationId=${selectedLocation}`);
+    const dataProvince = await response.json();
+    setProvince(dataProvince.data);
+    console.log('RESPONSE:', dataProvince);
+  };
+  fetchDataProvince();
+}, [selectedLocation]);
+  
+  
+  useEffect(() => {
+    const fetchDataCity = async () => {
+      const response = await fetch(`/api/auth/register/getDataCity?provinceId=${selectedProvince}`);
+      const dataCity = await response.json();
+      setCity(dataCity.data);
+      console.log('RESPONSE:', dataCity);
+    };
+    fetchDataCity();
+  }, [selectedProvince]);
+
+
+
+  useEffect(() => {
+    const fetchDataPostcode = async () => {
+      const response = await fetch(`/api/auth/register/getDataZipCode?cityId=${selectedCity}`);
+      const dataPostcode = await response.json();
+      setPostcode(dataPostcode.data);
+      console.log('RESPONSE:', dataPostcode); 
+    };
+    fetchDataPostcode();
+  }, [selectedCity]);
+  
+
+
+
+
+const handleLocation = (event: SelectChangeEvent) => {
+  setSelectedLocation(event.target.value);
+};
+
+  const handleProvince = (event: SelectChangeEvent) => {
+    setSelectedProvince(event.target.value);
+  };
+
+  const handleCity = (event: SelectChangeEvent) => {
+    setSelectedCity(event.target.value);
+  };
+
+  const handlePostcode = (event: SelectChangeEvent) => {
+    setSelectedPostcode(event.target.value);
+  };
+
 
   const handleContinue = async () => {
     setContinueButton(true);
@@ -212,13 +283,13 @@ export default function RegisterForm() {
             <div className="flex w-full flex-col">
               <Box sx={{ minWidth: 120 }}>
                 <FormControl fullWidth>
-                  <InputLabel id="country-select-label">Country</InputLabel>
+                  <InputLabel id="country-select-label">Location</InputLabel>
                   <Select
                     labelId="country-select-label"
                     id="country-select"
-                    value={country}
-                    label="Country"
-                    onChange={(event: SelectChangeEvent) => setCountry(event.target.value)}
+                    value={selectedLocation}
+                    label="Location"
+                    onChange={handleLocation}
                     className={inputStyle}
                     sx={{
                       width: '100%',
@@ -249,16 +320,65 @@ export default function RegisterForm() {
                     <MenuItem value="">
                       <em>Type to search country...</em>
                     </MenuItem>
-                    <MenuItem value="thailand">Thailand</MenuItem>
-                    <MenuItem value="usa">United States</MenuItem>
-                    <MenuItem value="uk">United Kingdom</MenuItem>
-                    <MenuItem value="japan">Japan</MenuItem>
-                    <MenuItem value="china">China</MenuItem>
-                    <MenuItem value="singapore">Singapore</MenuItem>
-                    <MenuItem value="malaysia">Malaysia</MenuItem>
-                    <MenuItem value="vietnam">Vietnam</MenuItem>
-                    <MenuItem value="indonesia">Indonesia</MenuItem>
-                    <MenuItem value="philippines">Philippines</MenuItem>
+                      {
+                        location.map((data) => (
+                          <MenuItem key={data.location_id} value={data.location_id}>
+                            {data.location_name}
+                          </MenuItem>
+                        ))    
+                    }
+                  </Select>
+                </FormControl>
+              </Box>
+            </div>
+
+            <div className="flex w-full flex-col">
+              <Box sx={{ minWidth: 120 }}>
+                <FormControl fullWidth>
+                  <InputLabel id="country-select-label">Province</InputLabel>
+                  <Select
+                    labelId="country-select-label"
+                    id="country-select"
+                    value={selectedProvince}
+                    label="Province"
+                    onChange={(event: SelectChangeEvent) => handleProvince(event)}
+                    className={inputStyle}
+                    sx={{
+                      width: '100%',
+                      height: '3rem',
+                      borderRadius: '1rem',
+                      padding: '0.5rem',
+                      border: '1px solid #ccc',
+                      backgroundColor: '#fff',
+                      color: '#000',
+                      fontSize: '1rem',
+                      marginTop: '3px',
+                    }}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200,
+                        },
+                      },
+                      autoFocus: true,
+                      disableAutoFocusItem: true,
+                      onKeyDown: (e) => {
+                        if (e.key === 'Backspace') {
+                          e.stopPropagation();
+                        }
+                      },
+                    }}
+                  >
+                    <MenuItem value="">
+                      <em>Type to search province...</em>
+                    </MenuItem>
+                    {
+                      province.map((data) => (
+                        <MenuItem key={data.province_state_id} value={data.province_state_id}>
+                          {data.province_state_name}
+                        </MenuItem>
+                      ))
+                    }
                   </Select>
                 </FormControl>
               </Box>
@@ -271,9 +391,9 @@ export default function RegisterForm() {
                   <Select
                     labelId="city-select-label"
                     id="city-select"
-                    value={city}
+                    value={selectedCity}
                     label="City"
-                    onChange={(event: SelectChangeEvent) => setCity(event.target.value)}
+                    onChange={(event: SelectChangeEvent) => handleCity(event)}
                     className={inputStyle}
                     sx={{
                       width: '100%',
@@ -304,16 +424,13 @@ export default function RegisterForm() {
                     <MenuItem value="">
                       <em>Type to search city...</em>
                     </MenuItem>
-                    <MenuItem value="bangkok">Bangkok</MenuItem>
-                    <MenuItem value="chiangmai">Chiang Mai</MenuItem>
-                    <MenuItem value="phuket">Phuket</MenuItem>
-                    <MenuItem value="pattaya">Pattaya</MenuItem>
-                    <MenuItem value="hatyai">Hat Yai</MenuItem>
-                    <MenuItem value="udonthani">Udon Thani</MenuItem>
-                    <MenuItem value="khonkaen">Khon Kaen</MenuItem>
-                    <MenuItem value="nakhonratchasima">Nakhon Ratchasima</MenuItem>
-                    <MenuItem value="suratthani">Surat Thani</MenuItem>
-                    <MenuItem value="ubonratchathani">Ubon Ratchathani</MenuItem>
+                    {
+                      city.map((data) => (
+                        <MenuItem key={data.city_id} value={data.city_id}>
+                          {data.city_name}
+                        </MenuItem>
+                      ))
+                    }
                   </Select>
                 </FormControl>
               </Box>
@@ -326,9 +443,9 @@ export default function RegisterForm() {
                   <Select
                     labelId="postcode-select-label"
                     id="postcode-select"
-                    value={postcode}
+                    value={selectedPostcode}
                     label="Postcode"
-                    onChange={(event: SelectChangeEvent) => setPostcode(event.target.value)}
+                    onChange={(event: SelectChangeEvent) => handlePostcode(event)}
                     className={inputStyle}
                     sx={{
                       width: '100%',
@@ -359,16 +476,13 @@ export default function RegisterForm() {
                     <MenuItem value="">
                       <em>Type to search postcode...</em>
                     </MenuItem>
-                    <MenuItem value="1">1</MenuItem>
-                    <MenuItem value="2">2</MenuItem>
-                    <MenuItem value="3">3</MenuItem>
-                    <MenuItem value="4">4</MenuItem>
-                    <MenuItem value="5">5</MenuItem>
-                    <MenuItem value="6">6</MenuItem>
-                    <MenuItem value="700">700</MenuItem>
-                    <MenuItem value="720">720</MenuItem>
-                    <MenuItem value="73000">73000</MenuItem>
-                    <MenuItem value="10">10</MenuItem>
+                    {
+                      postcode.map((data) => (
+                        <MenuItem key={data.zipcode_id} value={data.zipcode_id}>
+                          {data.zipcode}
+                        </MenuItem>
+                      ))
+                    }
                   </Select>
                 </FormControl>
               </Box>

@@ -5,14 +5,25 @@ const prisma = new PrismaClient();
 
 export async function GET(request: Request) {
     try {
-        const dataLocation = await prisma.location.findMany();
-        console.log(dataLocation);
-    if (!dataLocation) {
-        return NextResponse.json({ message: "Data not found" }, { status: 404 });
-    }
+        const locations = await prisma.location.findMany({
+            select: {
+                location_id: true,
+                location_name: true
+            }
+        });
+        
+        if (!locations || locations.length === 0) {
+            return NextResponse.json({
+                data: []
+            });
+        }
 
-    return NextResponse.json(dataLocation);
-} catch (error) {
-    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
-}
+        return NextResponse.json({
+            data: locations
+        });
+    } catch (error) {
+        return NextResponse.json({
+            data: []
+        }, { status: 500 });
+    }
 }

@@ -26,10 +26,10 @@ export async function GET(request: Request) {
 
     if (!dataZipCode || dataZipCode.length === 0) {
       return NextResponse.json({ message: "Data not found" }, { status: 404 });
+      
     }
 
-    console.log(dataZipCode);
-    return NextResponse.json(dataZipCode);
+    return NextResponse.json({ data: dataZipCode }, { status: 200 });
 
   } catch (error) {
     console.log(error);
