@@ -83,9 +83,19 @@ useEffect(() => {
 
 
 
-const handleLocation = (event: SelectChangeEvent) => {
-  setSelectedLocation(event.target.value);
-};
+  const handleLocation = (event: SelectChangeEvent) => {
+    const value = event.target.value;
+    setSelectedLocation(value);
+  
+    setSelectedProvince('');
+ 
+  
+    setSelectedCity('');
+    setCity([]);
+  
+    setSelectedPostcode('');
+    setPostcode([]);
+  };
 
   const handleProvince = (event: SelectChangeEvent) => {
     setSelectedProvince(event.target.value);
