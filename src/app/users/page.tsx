@@ -1,7 +1,13 @@
-export default function UserProfile() {
-  return (
-    <div>
-      <h1 className="text-2xl font-bold">User Profile</h1>
-    </div>
-  );
+'use client';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+export default function UserProfileRedirect() {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace('/users/settings/account');
+  }, [router]);
+
+  return null;
 }
