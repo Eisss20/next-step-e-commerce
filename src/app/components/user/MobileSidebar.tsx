@@ -9,7 +9,7 @@ interface MobileSidebarProps {
   className?: string;
 }
 
-export default function MobileSidebar({ isOpen, toggleSidebar, className }: MobileSidebarProps) {
+export default function MobileSidebar({ isOpen, toggleSidebar }: MobileSidebarProps) {
   const [slide, setSlide] = useState(1);
 
   const handleCloseSidebar = () => {
