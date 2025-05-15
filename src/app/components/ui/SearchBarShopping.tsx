@@ -35,7 +35,7 @@ export default function SearchBarShopping() {
   };
 
   return (
-    <section className="relative mx-auto mt-5 w-96">
+    <section className="relative mx-auto mt-5 w-80">
       {/* กล่อง input และ dropdown ควรอยู่ใน relative container */}
       <div className="relative">
         {/* Input */}
@@ -52,7 +52,7 @@ export default function SearchBarShopping() {
         {/* ไอคอนค้นหา */}
         <IoSearchCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 w-7 h-7 text-gray-500 cursor-pointer" />
 
-        {/* กล่องแสดงผลลัพธ์ */}
+        {/* กล่องsearch  */}
         {filteredResults.length > 0 && (
           <div className="absolute left-0 w-full mt-2 rounded-xl border border-gray-300 bg-white shadow-lg z-10">
             <ul className="list-none p-2">

@@ -27,8 +27,16 @@ export async function GET() {
   try {
     console.log("✅ API ถูกเรียก!");
 
-    // ✅ ใช้ Prisma Query ดึงข้อมูลจาก user_test
-    const users = await prisma.user_test.findMany();
+    // ✅ ใช้ Prisma Query ดึงข้อมูลจากโมเดล user แทน user_test
+    const users = await prisma.user.findMany({
+      select: {
+        user_id: true,
+        username: true,
+        email: true,
+        created_at: true,
+        updated_at: true
+      }
+    });
 
     return NextResponse.json({ success: true, data: users });
   } catch (error) {
