@@ -41,75 +41,153 @@ export default function ProductsPage() {
   const products: ExtendedProductType[] = [
     {
       id: 1,
-      name: 'Explorer Sneaker',
-      price: 129,
+      name: 'Air Jordan 1 Low SE',
+      net_price: 129,
+      price_per_unit: 200,
       image: '/products-images/shoe-1.2.avif',
       category: ['Performance Series'],
       mainCategory: ['men', 'new'],
+      images: [
+        '/products-images/shoe-1.2.avif',
+        '/products-images/shoe-1.avif',
+        '/products-images/shoe-2.1.avif',
+        '/products-images/shoe-2.2.avif',
+        '/products-images/shoe-3.1.avif',
+        '/products-images/shoe-3.2.avif',
+        '/products-images/shoe-4.1.avif',
+        '/products-images/shoe-4.2.avif',
+      ],
+      description: 'รองเท้าผู้ชาย',
+      discount_percent: 23,
     },
     {
       id: 2,
       name: 'Urban Walker',
-      price: 149,
+      net_price: 149,
+      price_per_unit: 210,
       image: '/products-images/shoe-1.avif',
       category: ['Limited Edition', 'Sale'],
       mainCategory: ['men', 'new'],
+      images: [
+        '/products-images/shoe-1.avif',
+        '/products-images/shoe-1.2.avif',
+        '/products-images/shoe-2.1.avif',
+        '/products-images/shoe-2.2.avif',
+      ],
+      description: 'รองเท้าผู้ชายสไตล์เออร์เบิ้น',
+      discount_percent: 29,
     },
     {
       id: 3,
       name: 'Terrain Explorer',
-      price: 159,
+      net_price: 159,
+      price_per_unit: 180,
       image: '/products-images/shoe-2.1.avif',
       category: ['Best Sellers'],
       mainCategory: ['men'],
+      images: [
+        '/products-images/shoe-2.1.avif',
+        '/products-images/shoe-2.2.avif',
+        '/products-images/shoe-3.1.avif',
+      ],
+      description: 'รองเท้าสำหรับสำรวจภูมิประเทศ',
+      discount_percent: 12,
     },
     {
       id: 4,
       name: 'City Runner',
-      price: 139,
+      net_price: 139,
+      price_per_unit: 175,
       image: '/products-images/shoe-2.2.avif',
       category: ['Performance Series'],
       mainCategory: ['women', 'new'],
+      images: [
+        '/products-images/shoe-2.2.avif',
+        '/products-images/shoe-3.1.avif',
+        '/products-images/shoe-3.2.avif',
+      ],
+      description: 'รองเท้าวิ่งสำหรับผู้หญิง',
+      discount_percent: 20,
     },
     {
       id: 5,
       name: 'Trail Blazer',
-      price: 159,
+      net_price: 159,
+      price_per_unit: 190,
       image: '/products-images/shoe-3.1.avif',
       category: ['Performance Series'],
       mainCategory: ['women'],
+      images: [
+        '/products-images/shoe-3.1.avif',
+        '/products-images/shoe-3.2.avif',
+        '/products-images/shoe-4.1.avif',
+      ],
+      description: 'รองเท้าสำหรับกิจกรรมผจญภัย',
+      discount_percent: 16,
     },
     {
       id: 6,
       name: 'Urban Explorer',
-      price: 169,
+      net_price: 169,
+      price_per_unit: 220,
       image: '/products-images/shoe-3.2.avif',
       category: ['Performance Series'],
       mainCategory: ['men'],
+      images: [
+        '/products-images/shoe-3.2.avif',
+        '/products-images/shoe-4.1.avif',
+        '/products-images/shoe-4.2.avif',
+      ],
+      description: 'รองเท้าผู้ชายสำหรับการเดินเมือง',
+      discount_percent: 23,
     },
     {
       id: 7,
       name: 'Mountain Climber',
-      price: 179,
+      net_price: 179,
+      price_per_unit: 240,
       image: '/products-images/shoe-4.1.avif',
       category: ['Performance Series'],
       mainCategory: ['men'],
+      images: [
+        '/products-images/shoe-4.1.avif',
+        '/products-images/shoe-4.2.avif',
+        '/products-images/shoe-1.2.avif',
+      ],
+      description: 'รองเท้าสำหรับปีนเขา',
+      discount_percent: 25,
     },
     {
       id: 8,
       name: 'Street Runner',
-      price: 189,
+      net_price: 189,
+      price_per_unit: 230,
       image: '/products-images/shoe-4.2.avif',
       category: ['Performance Series', 'Best Sellers'],
       mainCategory: ['women', 'new'],
+      images: [
+        '/products-images/shoe-4.2.avif',
+        '/products-images/shoe-1.avif',
+        '/products-images/shoe-2.1.avif',
+      ],
+      description: 'รองเท้าวิ่งสไตล์สตรีท',
+      discount_percent: 18,
     },
     {
       id: 9,
       name: 'Kids Jumper',
-      price: 109,
+      net_price: 109,
+      price_per_unit: 140,
       image: '/products-images/shoe-1.avif',
       category: ['Performance Series', 'Sale'],
       mainCategory: ['kids', 'new'],
+      images: [
+        '/products-images/shoe-1.avif',
+        '/products-images/shoe-2.2.avif',
+        '/products-images/shoe-3.1.avif',
+      ],
+      description: 'รองเท้าสำหรับเด็ก',
+      discount_percent: 22,
     },
   ];
 
@@ -127,7 +205,7 @@ export default function ProductsPage() {
   const filteredProducts: ExtendedProductType[] = products.filter(
     (product: ExtendedProductType) => {
       // ตัวกรองราคา
-      const priceMatch: boolean = product.price >= priceRange[0] && product.price <= priceRange[1];
+      const priceMatch: boolean = product.net_price >= priceRange[0] && product.net_price <= priceRange[1];
 
       // ตัวกรองหมวดหมู่หลัก (NEW, MEN, WOMEN, KIDS)
       let mainCategoryMatch: boolean = true;
@@ -184,7 +262,6 @@ export default function ProductsPage() {
   return (
     <div className="mx-auto py-12 sm:px-20">
       {/* หัวข้อหน้า */}
-    
 
       <div className="flex flex-col gap-10 md:flex-row">
         {/* Sidebar พร้อมตัวกรอง */}
@@ -193,7 +270,6 @@ export default function ProductsPage() {
           onPriceChange={handlePriceChange}
           activeCategory={activeCategory}
           onCategoryChange={handleCategoryChange}
-      
         />
 
         {/* แสดงสินค้าที่กรองแล้ว */}
