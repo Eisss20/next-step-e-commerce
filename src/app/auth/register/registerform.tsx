@@ -14,102 +14,130 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import axios from 'axios';
+import dayjs from 'dayjs';
+import { useRouter } from 'next/navigation';
+
+interface Location {
+  location_id: string;
+  location_name: string;
+}
+
+interface Province {
+  province_state_id: string;
+  province_state_name: string;
+}
+
+interface City {
+  city_id: string;
+  city_name: string;
+}
+
+interface Postcode {
+  zipcode_id: string;
+  zipcode: string;
+}
 
 export default function RegisterForm() {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setname] = useState('');
+  const [firstname, setfirstname] = useState('');
+  const [lastname, setlastname] = useState('');
+  const [phone, setphone] = useState('');
+  const [birthdate, setbirthdate] = useState<dayjs.Dayjs | null>(null);
+  const [address, setaddress] = useState('');
+  const [gender, setgender] = useState('');
+
   const [continueButton, setContinueButton] = useState(false);
 
-  
-  const [location, setLocation] = useState([])
-  const [selectedLocation, setSelectedLocation] = useState('')
-  
-  const [province, setProvince] = useState([])
-  const [selectedProvince, setSelectedProvince] = useState('')
-  
+  const [allLocation, setAllLocation] = useState<Location[]>([]);
+  const [selectedLocation, setSelectedLocation] = useState('');
 
-  const [city, setCity] = useState([])
-  const [selectedCity, setSelectedCity] = useState('')
+  const [allProvince, setAllProvince] = useState<Province[]>([]);
+  const [selectedProvince, setSelectedProvince] = useState('');
 
-  const [postcode, setPostcode] = useState([])
-  const [selectedPostcode, setSelectedPostcode] = useState('')
+  const [allCity, setAllCity] = useState<City[]>([]);
+  const [selectedCity, setSelectedCity] = useState('');
 
-useEffect(() => {
-  const fetchDataLocation = async () => {
-    const response = await fetch('/api/auth/register/getDataLocation');
-    const dataLocation = await response.json();
-    setLocation(dataLocation.data);
-    console.log('RESPONSE:', dataLocation);
-  };
-  fetchDataLocation();
-}, [selectedLocation]);
+  const [allPostcode, setAllPostcode] = useState<Postcode[]>([]);
+  const [selectedPostcode, setSelectedPostcode] = useState('');
 
-useEffect(() => {
-  const fetchDataProvince = async () => {
-    const response = await fetch(`/api/auth/register/getDataProvince?locationId=${selectedLocation}`);
-    const dataProvince = await response.json();
-    setProvince(dataProvince.data);
-    console.log('RESPONSE:', dataProvince);
-  };
-  fetchDataProvince();
-}, [selectedLocation]);
-  
-  
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchDataLocation = async () => {
+      const response = await fetch('/api/auth/register/getDataLocation');
+      const dataLocation = await response.json();
+      setAllLocation(dataLocation.data);
+      console.log('RESPONSE:', dataLocation);
+    };
+    fetchDataLocation();
+  }, [selectedLocation]);
+
+  useEffect(() => {
+    const fetchDataProvince = async () => {
+      const response = await fetch(
+        `/api/auth/register/getDataProvince?locationId=${selectedLocation}`
+      );
+      const dataProvince = await response.json();
+      setAllProvince(dataProvince.data);
+      console.log('RESPONSE:', dataProvince);
+    };
+    fetchDataProvince();
+  }, [selectedLocation]);
+
   useEffect(() => {
     const fetchDataCity = async () => {
       const response = await fetch(`/api/auth/register/getDataCity?provinceId=${selectedProvince}`);
       const dataCity = await response.json();
-      setCity(dataCity.data);
+      setAllCity(dataCity.data);
       console.log('RESPONSE:', dataCity);
     };
     fetchDataCity();
   }, [selectedProvince]);
 
-
-
   useEffect(() => {
     const fetchDataPostcode = async () => {
       const response = await fetch(`/api/auth/register/getDataZipCode?cityId=${selectedCity}`);
       const dataPostcode = await response.json();
-      setPostcode(dataPostcode.data);
-      console.log('RESPONSE:', dataPostcode); 
+      setAllPostcode(dataPostcode.data);
+      console.log('RESPONSE:', dataPostcode);
     };
     fetchDataPostcode();
   }, [selectedCity]);
-  
 
-
-
-
+  // function handleLocation for empty all selected province, city, postcode
   const handleLocation = (event: SelectChangeEvent) => {
     const value = event.target.value;
     setSelectedLocation(value);
-  
+
     setSelectedProvince('');
- 
-  
+
     setSelectedCity('');
-    setCity([]);
-  
+    setAllCity([]);
+
     setSelectedPostcode('');
-    setPostcode([]);
+    setAllPostcode([]);
   };
 
+
+  /// for select province
   const handleProvince = (event: SelectChangeEvent) => {
     setSelectedProvince(event.target.value);
   };
 
+  /// for select city
   const handleCity = (event: SelectChangeEvent) => {
     setSelectedCity(event.target.value);
   };
 
+  /// for select postcode
   const handlePostcode = (event: SelectChangeEvent) => {
     setSelectedPostcode(event.target.value);
   };
 
-
+  /// switch button continue and back
   const handleContinue = async () => {
     setContinueButton(true);
   };
@@ -117,18 +145,67 @@ useEffect(() => {
     setContinueButton(false);
   };
 
-  const handleSubmit = async () => {
-    console.log('submit');
+  // send data to backend
+  const CreateRegister = async () => {
+    try {
+      const response = await axios.post('/api/auth/register', {
+        email,
+        username,
+        password,
+        first_name: firstname,
+        last_name: lastname,
+        phone_number: phone,
+        gender,
+        date_of_birth: birthdate ? birthdate.format('YYYY-MM-DD') : '',
+        detail_address: address,
+        location_id: Number(selectedLocation),
+        province_state_id: Number(selectedProvince),
+        city_id: Number(selectedCity),
+        zipcode_id: Number(selectedPostcode),
+      });
+      alert('Successfully registered');
+      router.push('/auth/login');
+      console.log('RESPONSE:', response);
+      return response;
+    } catch (error) {
+      console.log('ERROR:', error);
+      throw error;
+    }
   };
-  // 1 ต้องใส่ข้อมูลทั้งหมด
-  // 2 กดปุ่ม continue จะเช็คว่าข้อมูลถูกต้องหรือไม่
-  // 3 ถ้าถูกต้องจะเปิดหน้าต่อไป
-  // 4 ถ้าไม่ถูกต้องจะไม่สามารถผ่านได้
-  // 5 ถ้าถูกต้องจะเปิดหน้าต่อไป
-  // 6 ถ้าไม่ถูกต้องจะไม่สามารถผ่านได้
-  // 7 จะมีข้อมูลให้กรอกเพิ่มเติม
-  // 8 จะมีปุ่มสำหรับกลับไปหน้าก่อนหน้า
-  // 9 มีปุ่มsubmit สำหรับส่งข้อมูลใน
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validate required fields section
+    if (
+      !email ||
+      !username ||
+      !password ||
+      !firstname ||
+      !lastname ||
+      !phone ||
+      !birthdate ||
+      !address ||
+      !selectedLocation ||
+      !selectedProvince ||
+      !selectedCity ||
+      !selectedPostcode
+    ) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    try {
+      const response = await CreateRegister();
+      if (response.status === 200) {
+        alert('Successfully registered');
+        router.push('/auth/login');
+      }
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      alert(error.response?.data?.message || 'Registration error');
+    }
+  };
 
   const inputStyle =
     'w-full rounded-2xl border-1 border-gray-300 bg-white p-2 hover:border-amber-600 focus:outline-none';
@@ -227,44 +304,65 @@ useEffect(() => {
           className="lg:border-block flex max-h-screen w-[20rem] flex-col items-center justify-center gap-10 rounded-xl lg:h-[50rem] lg:w-[50rem] lg:border-1 lg:border-white lg:bg-white/50"
         >
           <h1 className="text-shadow-[0_0_3px_#000,_0_0_5px_#000] text-shadow-lg text-5xl font-bold text-wrap text-black drop-shadow-sm"></h1>
-          <form
-            className="flex w-full max-w-[400px] flex-col gap-4 px-6"
-            onSubmit={(e) => {
-              e.preventDefault(); /* handle submit here */
-            }}
-          >
+          <form className="flex w-full max-w-[400px] flex-col gap-4 px-6" onSubmit={handleSubmit}>
             <div className="flex w-full flex-col gap-4 lg:flex-row">
               <div className="flex w-full flex-col lg:w-1/2">
                 <label htmlFor="name" className="pl-1 text-[12px] text-gray-500">
-                  Full name
+                  First name
                 </label>
                 <input
                   type="text"
                   className={inputStyle}
-                  placeholder="Full name"
-                  value={name}
-                  onChange={(e) => setname(e.target.value)}
+                  placeholder="First name"
+                  value={firstname}
+                  onChange={(e) => setfirstname(e.target.value)}
                 />
               </div>
               <div className="flex w-full flex-col lg:w-1/2">
                 <label htmlFor="lastname" className="pl-1 text-[12px] text-gray-500">
                   Last name
                 </label>
-                <input type="text" className={inputStyle} placeholder="Last name" />
+                <input
+                  type="text"
+                  className={inputStyle}
+                  value={lastname}
+                  onChange={(e) => setlastname(e.target.value)}
+                  placeholder="Last name"
+                />
               </div>
             </div>
 
             <div className="flex w-full flex-col">
+              <label htmlFor="gender" className="pl-1 text-[12px] text-gray-500">
+                Gender
+              </label>
+              <input
+                type="text"
+                className={inputStyle}
+                value={gender}
+                onChange={(e) => setgender(e.target.value)}
+                placeholder="Gender"
+              />
+            </div>
+            <div className="flex w-full flex-col">
               <label htmlFor="phone" className="pl-1 text-[12px] text-gray-500">
                 Phone
               </label>
-              <input type="text" className={inputStyle} placeholder="Phone" />
+              <input
+                type="text"
+                className={inputStyle}
+                value={phone}
+                onChange={(e) => setphone(e.target.value)}
+                placeholder="Phone"
+              />
             </div>
             {/* มีปัญหาเรื่อง ขอบ */}
             <div className="flex w-full flex-col">
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Birth Date"
+                  value={birthdate}
+                  onChange={(newValue) => setbirthdate(newValue)}
                   slotProps={{
                     textField: {
                       className: inputStyle,
@@ -287,7 +385,13 @@ useEffect(() => {
               <label htmlFor="address" className="pl-1 text-[12px] text-gray-500">
                 Address
               </label>
-              <textarea className={inputStyle} placeholder="Enter your full address" rows={4} />
+              <textarea
+                className={inputStyle}
+                value={address}
+                onChange={(e) => setaddress(e.target.value)}
+                placeholder="Enter your full address"
+                rows={4}
+              />
             </div>
 
             <div className="flex w-full flex-col">
@@ -330,13 +434,11 @@ useEffect(() => {
                     <MenuItem value="">
                       <em>Type to search country...</em>
                     </MenuItem>
-                      {
-                        location.map((data) => (
-                          <MenuItem key={data.location_id} value={data.location_id}>
-                            {data.location_name}
-                          </MenuItem>
-                        ))    
-                    }
+                    {allLocation.map((data) => (
+                      <MenuItem key={data.location_id} value={data.location_id}>
+                        {data.location_name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Box>
@@ -382,13 +484,11 @@ useEffect(() => {
                     <MenuItem value="">
                       <em>Type to search province...</em>
                     </MenuItem>
-                    {
-                      province.map((data) => (
-                        <MenuItem key={data.province_state_id} value={data.province_state_id}>
-                          {data.province_state_name}
-                        </MenuItem>
-                      ))
-                    }
+                    {allProvince.map((data) => (
+                      <MenuItem key={data.province_state_id} value={data.province_state_id}>
+                        {data.province_state_name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Box>
@@ -434,13 +534,11 @@ useEffect(() => {
                     <MenuItem value="">
                       <em>Type to search city...</em>
                     </MenuItem>
-                    {
-                      city.map((data) => (
-                        <MenuItem key={data.city_id} value={data.city_id}>
-                          {data.city_name}
-                        </MenuItem>
-                      ))
-                    }
+                    {allCity.map((data) => (
+                      <MenuItem key={data.city_id} value={data.city_id}>
+                        {data.city_name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Box>
@@ -486,13 +584,11 @@ useEffect(() => {
                     <MenuItem value="">
                       <em>Type to search postcode...</em>
                     </MenuItem>
-                    {
-                      postcode.map((data) => (
-                        <MenuItem key={data.zipcode_id} value={data.zipcode_id}>
-                          {data.zipcode}
-                        </MenuItem>
-                      ))
-                    }
+                    {allPostcode.map((data) => (
+                      <MenuItem key={data.zipcode_id} value={data.zipcode_id}>
+                        {data.zipcode}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Box>
