@@ -64,7 +64,7 @@ try {
 
     console.log(process.env.JWT_SECRET)
 
-    return NextResponse.json({ token, user: { email, username, password } });
+    return NextResponse.json({ token, user: { email, username } });
     
  
 
