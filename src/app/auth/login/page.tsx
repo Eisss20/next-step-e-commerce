@@ -5,39 +5,59 @@ import { FaFacebookSquare } from 'react-icons/fa';
 import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/context/AuthContext';
 
 export default function AuthPage() {
   const router = useRouter();
-
-  const [email, setEmail] = useState('');
+  const { AuthContextlogin, AuthContextlogout, isAuthenticated } = useAuth();
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLogout = () => {
+    AuthContextlogout();
+    router.push('/auth/login');
+  };
+
+  if (isAuthenticated) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center bg-[url('/images/auth/authwallpaper.avif')] bg-cover bg-center">
+        <section className="lg:border-block flex h-[30rem] w-[20rem] flex-col items-center justify-center gap-10 rounded-xl lg:h-[35rem] lg:w-[30rem] lg:border-1 lg:border-white lg:bg-white/50">
+          <h1 className="text-shadow-[0_0_3px_#000,_0_0_5px_#000] text-shadow-lg text-6xl font-bold text-white drop-shadow-sm">
+            Welcome
+          </h1>
+          <button
+            onClick={handleLogout}
+            className="hover:shadow-3xl transform cursor-pointer rounded-full border-b-1 border-amber-800 bg-amber-600 px-30 py-3 text-white shadow-lg drop-shadow-xl transition-transform duration-200 hover:scale-105 hover:bg-amber-700 active:bg-amber-800"
+          >
+            Logout
+          </button>
+        </section>
+      </main>
+    );
+  }
 
   const loginUser = async () => {
+    setIsLoading(true);
+    setError('');
     try {
-      const response = await axios.post('/api/auth/login', {
-        email,
-        password,
-      });
-
-      if (response.status === 200) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        router.push('/');
-      }
+      // เรียกใช้ฟังก์ชัน login จาก AuthContext
+      await AuthContextlogin(username, password);
     } catch (error: any) {
-      console.log('Login error:', error);
+      console.error('Login error:', error);
       if (error.response?.data?.error) {
         setError(error.response.data.error);
       } else {
-        setError('An error occurred during login');
+        setError('Invalid username/email or password. Please try again.');
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    setError(''); // Clear previous errors
     await loginUser();
   };
 
@@ -52,10 +72,11 @@ export default function AuthPage() {
             <input
               type="email"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="email"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="email or username"
               className="w-72 rounded-2xl border-2 border-gray-100 bg-white p-2 hover:border-amber-600 focus:outline-none"
+              disabled={isLoading}
             />
             <input
               type="password"
@@ -64,8 +85,13 @@ export default function AuthPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="password"
               className="w-72 rounded-2xl border-2 border-gray-100 bg-white p-2 hover:border-amber-600 focus:outline-none"
+              disabled={isLoading}
             />
-            {error && <p className="text-sm text-red-500">{error}</p>}
+            {error && (
+              <div className="w-72 rounded-lg bg-red-50 p-3 text-center">
+                <p className="text-sm font-medium text-red-600">{error}</p>
+              </div>
+            )}
           </form>
           <div className="flex flex-row items-center justify-center gap-10">
             <Link
@@ -86,9 +112,12 @@ export default function AuthPage() {
             <button
               onClick={handleSubmit}
               type="submit"
-              className="hover:shadow-3xl transform cursor-pointer rounded-full border-b-1 border-amber-800 bg-amber-600 px-30 py-3 text-white shadow-lg drop-shadow-xl transition-transform duration-200 hover:scale-105 hover:bg-amber-700 active:bg-amber-800"
+              disabled={isLoading}
+              className={`hover:shadow-3xl transform cursor-pointer rounded-full border-b-1 border-amber-800 bg-amber-600 px-30 py-3 text-white shadow-lg drop-shadow-xl transition-transform duration-200 hover:scale-105 hover:bg-amber-700 active:bg-amber-800 ${
+                isLoading ? 'cursor-not-allowed opacity-50' : ''
+              }`}
             >
-              Login
+              {isLoading ? 'Logging in...' : 'Login'}
             </button>
           </section>
           <p className="text-sm text-gray-500">

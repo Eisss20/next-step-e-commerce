@@ -4,7 +4,7 @@ import './globals.css';
 import NavbarUser from './components/commons/NavbarUser';
 import UserSidebar from './components/commons/UserSidebar';
 import FooterBar from './components/commons/FooterBar';
-
+import { AuthProvider } from './context/AuthContext'; 
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -35,10 +35,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
-        <NavbarUser />
-        <UserSidebar />
-        <main className="flex-grow">{children}</main>
-        <FooterBar />
+          <AuthProvider>
+          <NavbarUser />
+          <UserSidebar />
+          <main className="flex-grow">{children}</main>
+          <FooterBar />
+        </AuthProvider>
       </body>
     </html>
   );
