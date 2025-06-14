@@ -44,7 +44,7 @@ export default function Home() {
 
     window.addEventListener('wheel', handleScroll);
     return () => window.removeEventListener('wheel', handleScroll);
-  }, [currentSection]); // depend on currentSection เพื่อให้ทำงานถูกต้อง
+  }, [currentSection, scrollToNext, scrollToPrev]); // depend on currentSection, scrollToNext, scrollToPrev
 
   return (
     <>

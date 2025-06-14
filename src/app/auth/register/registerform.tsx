@@ -4,8 +4,6 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { IoArrowBack } from 'react-icons/io5';
 import { motion } from 'framer-motion';
-import { data, style, tr } from 'motion/react-client';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -121,7 +119,6 @@ export default function RegisterForm() {
     setAllPostcode([]);
   };
 
-
   /// for select province
   const handleProvince = (event: SelectChangeEvent) => {
     setSelectedProvince(event.target.value);
@@ -167,8 +164,19 @@ export default function RegisterForm() {
       router.push('/auth/login');
       console.log('RESPONSE:', response);
       return response;
-    } catch (error) {
-      console.log('ERROR:', error);
+    } catch (error: unknown) {
+      console.error('Registration error:', error);
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'response' in error &&
+        typeof (error as { response?: { data?: { message?: string } } }).response?.data?.message ===
+          'string'
+      ) {
+        alert((error as { response: { data: { message: string } } }).response.data.message);
+      } else {
+        alert('Registration error');
+      }
       throw error;
     }
   };
@@ -201,23 +209,24 @@ export default function RegisterForm() {
         alert('Successfully registered');
         router.push('/auth/login');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Registration error:', error);
-      alert(error.response?.data?.message || 'Registration error');
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'response' in error &&
+        typeof (error as { response?: { data?: { message?: string } } }).response?.data?.message ===
+          'string'
+      ) {
+        alert((error as { response: { data: { message: string } } }).response.data.message);
+      } else {
+        alert('Registration error');
+      }
     }
   };
 
   const inputStyle =
     'w-full rounded-2xl border-1 border-gray-300 bg-white p-2 hover:border-amber-600 focus:outline-none';
-
-  const selectStyle = `${inputStyle} cursor-pointer [&>option]:py-2 [&>option]:px-4 [&>option]:cursor-pointer [&>option]:bg-white [&>option:checked]:bg-blue-500 [&>option:checked]:text-white`;
-
-  // Add styles to force dropdown direction
-  const selectWrapperStyle = `
-    ${selectStyle}
-    [&_select]:absolute [&_select]:bottom-full
-    [&_option]:absolute [&_option]:top-full
-  `;
 
   return (
     <>

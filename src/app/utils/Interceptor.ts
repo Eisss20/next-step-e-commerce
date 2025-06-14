@@ -21,14 +21,21 @@ authRequest.interceptors.response.use(
     (response) => {
         return response;
     },
-        (error: any) => {
-    if (error.response.status === 401) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.replace('/auth/login');
+    (error: unknown) => {
+        if (
+            typeof error === 'object' &&
+            error !== null &&
+            'response' in error &&
+            typeof (error as { response?: { status?: number } }).response?.status === 'number' &&
+            (error as { response: { status: number } }).response.status === 401
+        ) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.replace('/auth/login');
+        }
+        return Promise.reject(error);
     }
-    return Promise.reject(error);
-});
+);
 
 export default authRequest;
 

@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function GET(request: Request) {
+export async function GET() {
     try {
         const locations = await prisma.location.findMany({
             select: {
@@ -21,7 +21,7 @@ export async function GET(request: Request) {
         return NextResponse.json({
             data: locations
         });
-    } catch (error) {
+    } catch {
         return NextResponse.json({
             data: []
         }, { status: 500 });

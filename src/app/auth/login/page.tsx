@@ -3,7 +3,6 @@ import { FcGoogle } from 'react-icons/fc';
 import Link from 'next/link';
 import { FaFacebookSquare } from 'react-icons/fa';
 import { useState } from 'react';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 
@@ -44,10 +43,16 @@ export default function AuthPage() {
     try {
       // เรียกใช้ฟังก์ชัน login จาก AuthContext
       await AuthContextlogin(username, password);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error);
-      if (error.response?.data?.error) {
-        setError(error.response.data.error);
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'response' in error &&
+        typeof (error as { response?: { data?: { error?: string } } }).response?.data?.error ===
+          'string'
+      ) {
+        setError((error as { response: { data: { error: string } } }).response.data.error);
       } else {
         setError('Invalid username/email or password. Please try again.');
       }
@@ -121,7 +126,7 @@ export default function AuthPage() {
             </button>
           </section>
           <p className="text-sm text-gray-500">
-            Don't have an account?
+            Don&apos;t have an account?
             <Link
               href="/auth/register"
               className="ml-2 text-amber-800 transition-transform duration-200 hover:text-amber-600 hover:underline"

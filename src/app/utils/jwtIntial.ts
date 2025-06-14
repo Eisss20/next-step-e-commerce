@@ -7,7 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET as string;
 
 
 
-export const signJWT = (payload: any ,JWT_SECRET: string) => {
+export const signJWT = (payload: Record<string, unknown>, JWT_SECRET: string) => {
     const token = jwt.sign(payload, JWT_SECRET);
     return token;
 }

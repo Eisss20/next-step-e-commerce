@@ -13,8 +13,8 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string, username: string) => Promise<void>;
-  logout: () => void;
+  AuthContextlogin: (username: string, password: string) => Promise<void>;
+  AuthContextlogout: () => void;
   loading: boolean;
 }
 
@@ -51,9 +51,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setToken(newToken);
         setUser(userData);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error);
-      throw error;
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error('Login error');
+      }
     }
   };
 

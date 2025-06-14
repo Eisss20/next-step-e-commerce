@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { signJWT, verifyJWT } from "@/app/utils/jwtIntial";
+import { signJWT } from "@/app/utils/jwtIntial";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient() 
@@ -68,13 +68,19 @@ try {
     
  
 
-} catch (error: any) {
+} catch (error: unknown) {
 
     console.error('Login error:', error);
     console.log("Internal server error");
     console.log(error);
+    if (error instanceof Error) {
+        return NextResponse.json(
+            { error: error.message },
+            { status: 500 }
+        );
+    }
     return NextResponse.json(
-        { error: error.message || "Internal server error" }, 
+        { error: "Internal server error" },
         { status: 500 }
     );
 }

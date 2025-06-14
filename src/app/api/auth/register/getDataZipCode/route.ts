@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export async function GET(request: Request) {
   try {
-    const searchParams = request.nextUrl.searchParams;
+    const { searchParams } = new URL(request.url);
     const cityId = searchParams.get("cityId");
 
     const conditionCityId = cityId ? { city_id: Number(cityId) } : undefined;

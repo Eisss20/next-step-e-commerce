@@ -5,8 +5,8 @@ const prisma = new PrismaClient();
 
 export async function GET(request: Request) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const locationId = searchParams.get("locationId");
+    const url = new URL(request.url);
+    const locationId = url.searchParams.get("locationId");
 
     const conditionLocationId = locationId ? { location_id: Number(locationId) } : undefined;
 
