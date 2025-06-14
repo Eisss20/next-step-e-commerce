@@ -42,70 +42,65 @@ function calculateAge(dateOfBirth: string) {
 }
 
 export async function POST(request: Request) {
+    try {
+        const userProfileData = await request.json();   
+        
+        const { username, email, password, first_name, last_name, phone_number, gender, date_of_birth,  
+                 detail_address, location_id, city_id, province_state_id, zipcode_id } = userProfileData as RegisterData;
 
-try {
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-    const userProfileData = await request.json();   
-    
-    const { username, email, password, first_name, last_name, phone_number, gender, date_of_birth,  
-             detail_address, location_id, city_id, province_state_id, zipcode_id } = userProfileData as RegisterData;
+        const userData = await prisma.user.create({
+            data: {
+                username,
+                password: hashedPassword,
+                email,
+            }
+        });
+        
+        const addressData = await prisma.address.create({
+            data: {
+                detail_address,
+                location_id: location_id,
+                city_id: city_id,
+                province_state_id: province_state_id,
+                zipcode_id: zipcode_id,
+                telephone_number: phone_number,
+            }
+        });
+        
+        const createProfile = await prisma.user_profile.create({
+            data: {
+                user_id: userData.user_id,
+                first_name,
+                last_name,
+                phone_number,
+                address_id: addressData.address_id,
+                gender,
+                date_of_birth: new Date(date_of_birth),
+                age: calculateAge(date_of_birth),   
+            }
+        });
+     
+        console.log("userData:", userData);
+        console.log("addressData:", addressData);
+        console.log("createProfile:", createProfile);
 
+        return NextResponse.json({ 
+            message: "Registration successful",
+            user: {
+                user_id: userData.user_id,
+                username: userData.username,
+                email: userData.email,
+                first_name,
+                last_name
+            }
+        }, { status: 201 });
 
-   const hashedPassword = await bcrypt.hash(password, 10);
-
-   const userData = await prisma.user.create({
-    data: {
-           username,
-           password: hashedPassword,
-           email,
-       }
-
-       
-   })
-    
-   const addressData = await prisma.address.create({
-       data: {
-        detail_address,
-        location_id: location_id,
-        city_id: city_id,
-        province_state_id: province_state_id,
-        zipcode_id: zipcode_id,
-        telephone_number: phone_number,
-    }
-   })
-    
-    
-   const createProfile = await prisma.user_profile.create({
-    data: {
-     user_id: userData.user_id,
-     first_name,
-     last_name,
-     phone_number,
-     address_id: addressData.address_id,
-     gender,
-     date_of_birth: new Date(date_of_birth),
-     age: calculateAge(date_of_birth),   
- }
-})
- 
-    console.log("userData:", userData);
-    console.log("addressData:", addressData);
-    console.log("createProfile:", createProfile);
-
-    return NextResponse.json({ 
-        message: "Registration successful",
-        user: {
-            user_id: userData.user_id,
-            username: userData.username,
-            email: userData.email,
-            first_name,
-            last_name
+    } catch (error) {
+        if (error instanceof Error) {
+            return NextResponse.json({ error: error.message }, { status: 400 });
         }
-    }, { status: 201 });
-
-} catch (error) {
-    if (error instanceof Error) {
-        return NextResponse.json({ error: error.message }, { status: 400 });
+        return NextResponse.json({ error: "Internal error" }, { status: 500 });
     }
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
 }
