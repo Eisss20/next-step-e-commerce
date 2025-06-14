@@ -25,7 +25,7 @@ export default function AuthPage() {
       <main className="flex min-h-screen flex-col items-center justify-center bg-[url('/images/auth/authwallpaper.avif')] bg-cover bg-center">
         <section className="lg:border-block flex h-[30rem] w-[20rem] flex-col items-center justify-center gap-10 rounded-xl lg:h-[35rem] lg:w-[30rem] lg:border-1 lg:border-white lg:bg-white/50">
           <h1 className="text-shadow-[0_0_3px_#000,_0_0_5px_#000] text-shadow-lg text-6xl font-bold text-white drop-shadow-sm">
-            Welcome
+            login success
           </h1>
           <button
             onClick={handleLogout}
@@ -70,11 +70,11 @@ export default function AuthPage() {
           </h1>
           <form className="flex flex-col items-center justify-center gap-5">
             <input
-              type="email"
+              type="text"
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="email or username"
+              placeholder="username"
               className="w-72 rounded-2xl border-2 border-gray-100 bg-white p-2 hover:border-amber-600 focus:outline-none"
               disabled={isLoading}
             />

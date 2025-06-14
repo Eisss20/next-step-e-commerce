@@ -9,6 +9,8 @@ import { GoPerson } from 'react-icons/go';
 import CartButton from '../cart/CartButton';
 import SlideText from '../ui/SlideText';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/app/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 // กำหนด interface สำหรับรายการสินค้าในแต่ละ category
 // Define interface for product items in each category
@@ -52,6 +54,17 @@ export default function NavbarUser() {
   // Ref for managing dropdown show/hide timeout
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // สถานะสำหรับเก็บสถานะของปุ่ม login
+  // State for storing login button visibility
+  const [showLoginButton, setShowLoginButton] = useState(false);
+  const { isAuthenticated, AuthContextlogout } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    AuthContextlogout();
+    router.push('/auth/login');
+  };
+
   // ฟังก์ชันจัดการเมื่อ hover ที่เมนู
   // Function to handle menu hover
   const handleCategoryHover = (id: number) => {
@@ -72,6 +85,15 @@ export default function NavbarUser() {
     }, 100);
   };
 
+  const handleLoginButtonLeave = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      setShowLoginButton(false);
+    }, 1000); // ค้างไว้ 1 วินาที
+  };
+
   // รายการเมนูหลัก
   // Main menu items
   const menuItems = [
@@ -85,7 +107,19 @@ export default function NavbarUser() {
   // Action items (right side buttons)
   const actionItems = [
     { id: 'contract', label: 'Contact us', type: 'link', route: '#' },
-    { id: 'person', icon: <GoPerson className="h-6 w-6" />, type: 'link', route: '#' },
+    {
+      id: 'person',
+      icon: <GoPerson className="h-6 w-6" />,
+      type: 'link',
+      route: '/auth/login',
+      onMouseEnter: () => {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+        setShowLoginButton(true);
+      },
+      onMouseLeave: handleLoginButtonLeave,
+    },
     { id: 'heart', icon: <PiHeartFill className="h-6 w-6" />, type: 'link', route: '#' },
   ];
 
@@ -322,9 +356,49 @@ export default function NavbarUser() {
                   key={item.id}
                   whileHover={{ scale: 1.1 }}
                   transition={{ duration: 0.3 }}
-                  className="flex justify-center rounded-2xl p-2 whitespace-nowrap transition-all duration-300 hover:bg-gray-200 hover:text-amber-600"
+                  className="relative flex justify-center rounded-2xl p-2 whitespace-nowrap transition-all duration-300 hover:bg-gray-200 hover:text-amber-600"
+                  onMouseEnter={item.onMouseEnter}
+                  onMouseLeave={item.onMouseLeave}
                 >
                   <Link href={item.route}>{item.label ?? item.icon}</Link>
+                  {item.id === 'person' && showLoginButton && !isAuthenticated && (
+                    <div
+                      className="absolute top-full cursor-pointer left-0 z-50 mt-2 w-32 rounded-md bg-white p-2 shadow-lg"
+                      onMouseEnter={() => {
+                        if (timeoutRef.current) {
+                          clearTimeout(timeoutRef.current);
+                        }
+                        setShowLoginButton(true);
+                      }}
+                      onMouseLeave={handleLoginButtonLeave}
+                    >
+                      <Link
+                        href="/auth/login"
+                        className="block cursor-pointer w-full rounded-md bg-amber-600 px-4 py-2 text-center text-sm text-white hover:bg-amber-700"
+                      >
+                        Login
+                      </Link>
+                    </div>
+                  )}
+                  {item.id === 'person' && showLoginButton && isAuthenticated && (
+                    <div
+                      className="absolute top-full left-0 z-50 mt-2 w-32 rounded-md bg-white p-2 shadow-lg"
+                      onMouseEnter={() => {
+                        if (timeoutRef.current) {
+                          clearTimeout(timeoutRef.current);
+                        }
+                        setShowLoginButton(true);
+                      }}
+                      onMouseLeave={handleLoginButtonLeave}
+                    >
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full cursor-pointer rounded-md bg-red-600 px-4 py-2 text-center text-sm text-white hover:bg-red-700"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
                 </motion.div>
               ))}
               <CartButton />
