@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import { PrismaClient } from '@prisma/client' 
 import bcrypt from "bcrypt";
@@ -110,4 +109,3 @@ try {
     }
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
 }
-
