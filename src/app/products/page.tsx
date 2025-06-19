@@ -2,249 +2,172 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import axios from 'axios';
 import { ProductType } from '@/types/types';
 import Sidebar from './components/Sidebar';
 import ProductGrid from './components/ProductGrid';
 
-// อัพเดทประเภทสินค้าให้รองรับ mainCategory
 interface ExtendedProductType extends ProductType {
-  mainCategory?: string[];
+  mainCategory?: string | string[];
 }
 
 export default function ProductsPage() {
-  // รับพารามิเตอร์จาก URL
   const searchParams = useSearchParams();
   const mainCategoryParam = searchParams.get('mainCategory');
   const categoryParam = searchParams.get('category');
 
-  // สถานะสำหรับตัวกรองช่วงราคา
+  const [products, setProducts] = useState<ExtendedProductType[]>([]);
   const [priceRange, setPriceRange] = useState<number[]>([0, 300]);
-
-  // สถานะสำหรับตัวกรองหมวดหมู่ที่กำลังทำงานอยู่
   const [activeCategory, setActiveCategory] = useState<string>('All Products');
-
-  // สถานะสำหรับเก็บหมวดหมู่หลัก
   const [activeMainCategory, setActiveMainCategory] = useState<string>('all');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
 
-  // อัปเดตหมวดหมู่จาก URL พารามิเตอร์
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get('/api/products');
+
+        if (res.data) {
+          if (res.data.success && Array.isArray(res.data.data)) {
+            setProducts(res.data.data);
+            setError('');
+          } else if (Array.isArray(res.data.data)) {
+            setProducts(res.data.data);
+            setError('');
+          } else if (Array.isArray(res.data)) {
+            setProducts(res.data);
+            setError('');
+          } else if (Array.isArray(res.data.products)) {
+            setProducts(res.data.products);
+            setError('');
+          } else {
+            setError(
+              `Invalid API response structure. Available keys: ${Object.keys(res.data).join(', ')}`
+            );
+          }
+        } else {
+          setError('No data received from API');
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          setError(
+            `API Error: ${error.response?.status} - ${error.response?.statusText || error.message}`
+          );
+        } else {
+          setError('Failed to fetch products');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   useEffect(() => {
     if (mainCategoryParam) {
       setActiveMainCategory(mainCategoryParam);
     }
-
     if (categoryParam) {
       setActiveCategory(categoryParam);
     }
   }, [mainCategoryParam, categoryParam]);
 
-  // ข้อมูลสินค้าตัวอย่าง - เพิ่ม mainCategory
-  const products: ExtendedProductType[] = [
-    {
-      id: 1,
-      name: 'Air Jordan 1 Low SE',
-      net_price: 129,
-      price_per_unit: 200,
-      image: '/products-images/shoe-1.2.avif',
-      category: ['Performance Series'],
-      mainCategory: ['men', 'new'],
-      images: [
-        '/products-images/shoe-1.2.avif',
-        '/products-images/shoe-1.avif',
-        '/products-images/shoe-2.1.avif',
-        '/products-images/shoe-2.2.avif',
-        '/products-images/shoe-3.1.avif',
-        '/products-images/shoe-3.2.avif',
-        '/products-images/shoe-4.1.avif',
-        '/products-images/shoe-4.2.avif',
-      ],
-      description: 'รองเท้าผู้ชาย',
-      discount_percent: 23,
-    },
-    {
-      id: 2,
-      name: 'Urban Walker',
-      net_price: 149,
-      price_per_unit: 210,
-      image: '/products-images/shoe-1.avif',
-      category: ['Limited Edition', 'Sale'],
-      mainCategory: ['men', 'new'],
-      images: [
-        '/products-images/shoe-1.avif',
-        '/products-images/shoe-1.2.avif',
-        '/products-images/shoe-2.1.avif',
-        '/products-images/shoe-2.2.avif',
-      ],
-      description: 'รองเท้าผู้ชายสไตล์เออร์เบิ้น',
-      discount_percent: 29,
-    },
-    {
-      id: 3,
-      name: 'Terrain Explorer',
-      net_price: 159,
-      price_per_unit: 180,
-      image: '/products-images/shoe-2.1.avif',
-      category: ['Best Sellers'],
-      mainCategory: ['men'],
-      images: [
-        '/products-images/shoe-2.1.avif',
-        '/products-images/shoe-2.2.avif',
-        '/products-images/shoe-3.1.avif',
-      ],
-      description: 'รองเท้าสำหรับสำรวจภูมิประเทศ',
-      discount_percent: 12,
-    },
-    {
-      id: 4,
-      name: 'City Runner',
-      net_price: 139,
-      price_per_unit: 175,
-      image: '/products-images/shoe-2.2.avif',
-      category: ['Performance Series'],
-      mainCategory: ['women', 'new'],
-      images: [
-        '/products-images/shoe-2.2.avif',
-        '/products-images/shoe-3.1.avif',
-        '/products-images/shoe-3.2.avif',
-      ],
-      description: 'รองเท้าวิ่งสำหรับผู้หญิง',
-      discount_percent: 20,
-    },
-    {
-      id: 5,
-      name: 'Trail Blazer',
-      net_price: 159,
-      price_per_unit: 190,
-      image: '/products-images/shoe-3.1.avif',
-      category: ['Performance Series'],
-      mainCategory: ['women'],
-      images: [
-        '/products-images/shoe-3.1.avif',
-        '/products-images/shoe-3.2.avif',
-        '/products-images/shoe-4.1.avif',
-      ],
-      description: 'รองเท้าสำหรับกิจกรรมผจญภัย',
-      discount_percent: 16,
-    },
-    {
-      id: 6,
-      name: 'Urban Explorer',
-      net_price: 169,
-      price_per_unit: 220,
-      image: '/products-images/shoe-3.2.avif',
-      category: ['Performance Series'],
-      mainCategory: ['men'],
-      images: [
-        '/products-images/shoe-3.2.avif',
-        '/products-images/shoe-4.1.avif',
-        '/products-images/shoe-4.2.avif',
-      ],
-      description: 'รองเท้าผู้ชายสำหรับการเดินเมือง',
-      discount_percent: 23,
-    },
-    {
-      id: 7,
-      name: 'Mountain Climber',
-      net_price: 179,
-      price_per_unit: 240,
-      image: '/products-images/shoe-4.1.avif',
-      category: ['Performance Series'],
-      mainCategory: ['men'],
-      images: [
-        '/products-images/shoe-4.1.avif',
-        '/products-images/shoe-4.2.avif',
-        '/products-images/shoe-1.2.avif',
-      ],
-      description: 'รองเท้าสำหรับปีนเขา',
-      discount_percent: 25,
-    },
-    {
-      id: 8,
-      name: 'Street Runner',
-      net_price: 189,
-      price_per_unit: 230,
-      image: '/products-images/shoe-4.2.avif',
-      category: ['Performance Series', 'Best Sellers'],
-      mainCategory: ['women', 'new'],
-      images: [
-        '/products-images/shoe-4.2.avif',
-        '/products-images/shoe-1.avif',
-        '/products-images/shoe-2.1.avif',
-      ],
-      description: 'รองเท้าวิ่งสไตล์สตรีท',
-      discount_percent: 18,
-    },
-    {
-      id: 9,
-      name: 'Kids Jumper',
-      net_price: 109,
-      price_per_unit: 140,
-      image: '/products-images/shoe-1.avif',
-      category: ['Performance Series', 'Sale'],
-      mainCategory: ['kids', 'new'],
-      images: [
-        '/products-images/shoe-1.avif',
-        '/products-images/shoe-2.2.avif',
-        '/products-images/shoe-3.1.avif',
-      ],
-      description: 'รองเท้าสำหรับเด็ก',
-      discount_percent: 22,
-    },
-  ];
-
-  // จัดการการเปลี่ยนแปลงช่วงราคา
   const handlePriceChange = (value: number[]): void => {
     setPriceRange(value);
   };
 
-  // จัดการการเปลี่ยนแปลงหมวดหมู่ย่อย
   const handleCategoryChange = (category: string): void => {
     setActiveCategory(category);
   };
 
-  // กรองสินค้าตามหมวดหมู่หลัก, หมวดหมู่ย่อย และช่วงราคา
-  const filteredProducts: ExtendedProductType[] = products.filter(
-    (product: ExtendedProductType) => {
-      // ตัวกรองราคา
-      const priceMatch: boolean = product.net_price >= priceRange[0] && product.net_price <= priceRange[1];
+  const filteredProducts: ExtendedProductType[] = products.filter((product) => {
+    const priceMatch = product.net_price >= priceRange[0] && product.net_price <= priceRange[1];
 
-      // ตัวกรองหมวดหมู่หลัก (NEW, MEN, WOMEN, KIDS)
-      let mainCategoryMatch: boolean = true;
-      if (activeMainCategory !== 'all') {
-        mainCategoryMatch = product.mainCategory?.includes(activeMainCategory) || false;
-      }
-
-      // ตัวกรองหมวดหมู่ย่อย (Sale, Best Sellers, Limited Edition, Performance Series)
-      let categoryMatch: boolean = true;
-      if (activeCategory !== 'All Products') {
-        categoryMatch = product.category?.includes(activeCategory) || false;
-      }
-
-      return priceMatch && mainCategoryMatch && categoryMatch;
+    let mainCategoryMatch = false;
+    if (activeMainCategory === 'all') {
+      mainCategoryMatch = true;
+    } else if (Array.isArray(product.mainCategory)) {
+      mainCategoryMatch = product.mainCategory.includes(activeMainCategory);
+    } else if (typeof product.mainCategory === 'string') {
+      mainCategoryMatch = product.mainCategory === activeMainCategory;
+    } else {
+      mainCategoryMatch = true;
     }
-  );
 
-  // หาหมวดหมู่ย่อยที่มีในหมวดหมู่หลักที่เลือก
+    let categoryMatch = false;
+    if (activeCategory === 'All Products') {
+      categoryMatch = true;
+    } else {
+      if (Array.isArray(product.category)) {
+        categoryMatch = product.category.includes(activeCategory);
+      } else if (
+        product.category &&
+        typeof product.category === 'object' &&
+        'name' in product.category
+      ) {
+        categoryMatch = (product.category as any).name === activeCategory;
+      } else if (typeof product.category === 'string') {
+        categoryMatch = product.category === activeCategory;
+      }
+
+      if (!categoryMatch && product.label) {
+        if (typeof product.label === 'object' && 'name' in product.label) {
+          categoryMatch = product.label.name === activeCategory;
+        } else if (typeof product.label === 'string') {
+          categoryMatch = product.label === activeCategory;
+        }
+      }
+    }
+
+    return priceMatch && mainCategoryMatch && categoryMatch;
+  });
+
   const getAvailableCategories = (): string[] => {
     const categories = new Set<string>();
     categories.add('All Products');
 
     products.forEach((product) => {
-      if (activeMainCategory === 'all' || product.mainCategory?.includes(activeMainCategory)) {
-        product.category?.forEach((cat) => {
-          categories.add(cat);
-        });
+      let matchesMainCategory = false;
+      if (activeMainCategory === 'all') {
+        matchesMainCategory = true;
+      } else if (Array.isArray(product.mainCategory)) {
+        matchesMainCategory = product.mainCategory.includes(activeMainCategory);
+      } else if (typeof product.mainCategory === 'string') {
+        matchesMainCategory = product.mainCategory === activeMainCategory;
+      } else {
+        matchesMainCategory = true;
+      }
+
+      if (matchesMainCategory) {
+        if (Array.isArray(product.category)) {
+          product.category.forEach((cat) => categories.add(cat));
+        } else if (
+          product.category &&
+          typeof product.category === 'object' &&
+          'name' in product.category
+        ) {
+          categories.add((product.category as any).name);
+        } else if (typeof product.category === 'string') {
+          categories.add(product.category);
+        }
+
+        if (product.label) {
+          if (typeof product.label === 'object' && 'name' in product.label) {
+            categories.add(product.label.name);
+          } else if (typeof product.label === 'string') {
+            categories.add(product.label);
+          }
+        }
       }
     });
 
     return Array.from(categories);
   };
 
-  // สร้างชื่อหัวข้อหน้าที่กำลังดูอยู่
   const getPageTitle = (): string => {
-    if (activeMainCategory === 'all') {
-      return 'All Products';
-    }
-
     switch (activeMainCategory) {
       case 'new':
         return 'New Arrivals';
@@ -255,24 +178,49 @@ export default function ProductsPage() {
       case 'kids':
         return 'Kids Collection';
       default:
-        return 'Products';
+        return 'All Products';
     }
   };
 
+  if (loading) {
+    return (
+      <div className="mx-auto py-12 sm:px-20">
+        <div className="flex min-h-[400px] items-center justify-center">
+          <div className="text-lg">Loading products...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mx-auto py-12 sm:px-20">
+        <div className="flex min-h-[400px] items-center justify-center">
+          <div className="text-red-500">Error: {error}</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <div className="mx-auto py-12 sm:px-20">
+        <div className="flex min-h-[400px] items-center justify-center">
+          <div className="text-lg">No products found</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto py-12 sm:px-20">
-      {/* หัวข้อหน้า */}
-
       <div className="flex flex-col gap-10 md:flex-row">
-        {/* Sidebar พร้อมตัวกรอง */}
         <Sidebar
           priceRange={priceRange}
           onPriceChange={handlePriceChange}
           activeCategory={activeCategory}
           onCategoryChange={handleCategoryChange}
         />
-
-        {/* แสดงสินค้าที่กรองแล้ว */}
         <ProductGrid products={filteredProducts} />
       </div>
     </div>

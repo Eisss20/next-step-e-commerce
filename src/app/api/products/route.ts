@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
     const totalProducts = await prisma.product.count({ where });
     const totalPages = Math.ceil(totalProducts / limit);
 
-    // แปลงข้อมูลให้เหมาะสมกับ Frontend
+    // แปลงข้อมูลสินค้าให้ตรงตามรูปแบบที่ต้องการ
     const formattedProducts = products.map((product) => ({
       id: product.product_id,
       name: product.product_name,

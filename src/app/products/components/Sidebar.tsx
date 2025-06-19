@@ -4,12 +4,18 @@ import { useState, useEffect } from 'react';
 import { CustomSlider } from '../../components/ui/SliderPrice';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import axios from 'axios';
 
 interface SidebarProps {
   priceRange: number[];
   onPriceChange: (value: number[]) => void;
   activeCategory: string;
   onCategoryChange: (category: string) => void;
+}
+
+interface Label {
+  id: number;
+  name: string;
 }
 
 export default function Sidebar({
@@ -20,6 +26,7 @@ export default function Sidebar({
 }: SidebarProps) {
   // Local state for the slider value
   const [sliderValue, setSliderValue] = useState<number[]>(priceRange);
+  const [labels, setLabels] = useState<Label[]>([]);
 
   // Get URL parameters to determine main category
   const searchParams = useSearchParams();
@@ -33,9 +40,9 @@ export default function Sidebar({
       case 'new':
         return 'NEW';
       case 'men':
-        return "MEN";
+        return 'MEN';
       case 'women':
-        return "WOMEN";
+        return 'WOMEN';
       case 'kids':
         return 'KIDS';
       default:
@@ -47,6 +54,23 @@ export default function Sidebar({
   useEffect(() => {
     setSliderValue(priceRange);
   }, [priceRange]);
+
+  // Fetch labels from API (assuming you have an endpoint for this)
+  useEffect(() => {
+    const fetchLabels = async () => {
+      try {
+        const res = await axios.get('/api/labels');
+        const json = res.data;
+        if (json.success) {
+          setLabels(json.data);
+        }
+      } catch (error) {
+        console.error('Error fetching labels:', error);
+      }
+    };
+
+    fetchLabels();
+  }, []);
 
   // Handle slider change
   const handleSliderChange = (_: Event, newValue: number | number[]): void => {
@@ -98,7 +122,6 @@ export default function Sidebar({
     return path;
   };
 
-
   const breadcrumbPath = generateBreadcrumbPath();
 
   return (
@@ -126,15 +149,25 @@ export default function Sidebar({
       <div className="mb-8">
         <h2 className="mb-4 text-lg font-medium">Browse by</h2>
         <ul className="space-y-2">
-          {categories.map((category: string) => (
-            <li key={category}>
+          <li>
+            <button
+              className={`w-full py-1 text-left text-sm ${
+                activeCategory === 'All Products' ? 'font-semibold text-amber-600' : 'text-gray-600'
+              }`}
+              onClick={() => onCategoryChange('All Products')}
+            >
+              All Products
+            </button>
+          </li>
+          {labels.map((label) => (
+            <li key={label.id}>
               <button
                 className={`w-full py-1 text-left text-sm ${
-                  activeCategory === category ? 'font-semibold text-amber-600' : 'text-gray-600'
+                  activeCategory === label.name ? 'font-semibold text-amber-600' : 'text-gray-600'
                 }`}
-                onClick={() => onCategoryChange(category)}
+                onClick={() => onCategoryChange(label.name)}
               >
-                {category}
+                {label.name}
               </button>
             </li>
           ))}
