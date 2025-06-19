@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import axios from 'axios';
 
+// Types
 interface SidebarProps {
   priceRange: number[];
   onPriceChange: (value: number[]) => void;
@@ -18,90 +19,74 @@ interface Label {
   name: string;
 }
 
+interface Category {
+  id: number;
+  name: string;
+  product_count: number;
+}
+
+interface BreadcrumbItem {
+  name: string;
+  link: string;
+}
+
+// Constants
+const MAIN_CATEGORY_DISPLAYS = {
+  new: 'NEW',
+  men: 'MEN',
+  women: 'WOMEN',
+  kids: 'KIDS',
+} as const;
+
+const MAIN_CATEGORIES = [
+  'men',
+  'man',
+  'women',
+  'woman',
+  'kids',
+  'kid',
+  'children',
+  'child',
+  'new',
+  'new arrival',
+  'new arrivals',
+];
+
 export default function Sidebar({
   priceRange,
   onPriceChange,
   activeCategory,
   onCategoryChange,
 }: SidebarProps) {
-  // Local state for the slider value
-  const [sliderValue, setSliderValue] = useState<number[]>(priceRange);
-  const [labels, setLabels] = useState<Label[]>([]);
-
-  // Get URL parameters to determine main category
   const searchParams = useSearchParams();
   const mainCategoryParam = searchParams.get('mainCategory');
 
-  // Format main category for display
+  // State
+  const [sliderValue, setSliderValue] = useState<number[]>(priceRange);
+  const [labels, setLabels] = useState<Label[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  // Helper functions
+  const isMainCategory = (categoryName: string): boolean => {
+    return MAIN_CATEGORIES.includes(categoryName.toLowerCase().trim());
+  };
+
   const getMainCategoryDisplay = (mainCategory: string | null): string => {
     if (!mainCategory) return 'All Products';
-
-    switch (mainCategory) {
-      case 'new':
-        return 'NEW';
-      case 'men':
-        return 'MEN';
-      case 'women':
-        return 'WOMEN';
-      case 'kids':
-        return 'KIDS';
-      default:
-        return 'PRODUCTS';
-    }
+    return (
+      MAIN_CATEGORY_DISPLAYS[mainCategory as keyof typeof MAIN_CATEGORY_DISPLAYS] || 'PRODUCTS'
+    );
   };
 
-  // Update local state when props change
-  useEffect(() => {
-    setSliderValue(priceRange);
-  }, [priceRange]);
+  const generateBreadcrumbPath = (): BreadcrumbItem[] => {
+    const path: BreadcrumbItem[] = [{ name: 'Home', link: '/' }];
 
-  // Fetch labels from API (assuming you have an endpoint for this)
-  useEffect(() => {
-    const fetchLabels = async () => {
-      try {
-        const res = await axios.get('/api/labels');
-        const json = res.data;
-        if (json.success) {
-          setLabels(json.data);
-        }
-      } catch (error) {
-        console.error('Error fetching labels:', error);
-      }
-    };
-
-    fetchLabels();
-  }, []);
-
-  // Handle slider change
-  const handleSliderChange = (_: Event, newValue: number | number[]): void => {
-    const value = newValue as number[];
-    setSliderValue(value);
-    onPriceChange(value);
-  };
-
-  const categories: string[] = [
-    'All Products',
-    'Best Sellers',
-    'Sale',
-    'Performance Series',
-    'Limited Edition',
-  ];
-
-  // Generate breadcrumb path based on active selections
-  const generateBreadcrumbPath = () => {
-    const path = [];
-
-    // Always add Home
-    path.push({ name: 'Home', link: '/' });
-
-    // Add main category if available
     if (mainCategoryParam) {
       path.push({
         name: getMainCategoryDisplay(mainCategoryParam),
         link: `/products?mainCategory=${mainCategoryParam}`,
       });
 
-      // ✅ ถ้า activeCategory เป็น "All Products" ให้แสดงใน breadcrumb ด้วย
       if (activeCategory === 'All Products') {
         path.push({
           name: 'All Products',
@@ -110,7 +95,6 @@ export default function Sidebar({
       }
     }
 
-    // Add sub-category if selected and not "All Products"
     if (activeCategory && activeCategory !== 'All Products') {
       const link = mainCategoryParam
         ? `/products?mainCategory=${mainCategoryParam}&category=${encodeURIComponent(activeCategory)}`
@@ -122,11 +106,49 @@ export default function Sidebar({
     return path;
   };
 
+  // Effects
+  useEffect(() => {
+    setSliderValue(priceRange);
+  }, [priceRange]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [labelsRes, categoriesRes] = await Promise.all([
+          axios.get('/api/labels'),
+          axios.get('/api/categories'),
+        ]);
+
+        if (labelsRes.data.success) {
+          setLabels(labelsRes.data.data);
+        }
+
+        if (categoriesRes.data.success) {
+          const filteredCategories = categoriesRes.data.data.filter(
+            (category: Category) => !isMainCategory(category.name)
+          );
+          setCategories(filteredCategories);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, [mainCategoryParam]);
+
+  // Event handlers
+  const handleSliderChange = (_: Event, newValue: number | number[]): void => {
+    const value = newValue as number[];
+    setSliderValue(value);
+    onPriceChange(value);
+  };
+
   const breadcrumbPath = generateBreadcrumbPath();
 
   return (
     <aside className="w-full shrink-0 md:w-64">
-      {/* Dynamic Breadcrumb Navigation */}
+      {/* Breadcrumb Navigation */}
       <nav className="mb-4 flex text-sm">
         {breadcrumbPath.map((item, index) => (
           <span key={index} className="flex items-center">
@@ -142,10 +164,10 @@ export default function Sidebar({
         ))}
       </nav>
 
-      <h1 className="mb-8 text-3xl font-bold">
-        {mainCategoryParam ? getMainCategoryDisplay(mainCategoryParam) : 'All Products'}
-      </h1>
+      {/* Page Title */}
+      <h1 className="mb-8 text-3xl font-bold">{getMainCategoryDisplay(mainCategoryParam)}</h1>
 
+      {/* Category Filter */}
       <div className="mb-8">
         <h2 className="mb-4 text-lg font-medium">Browse by</h2>
         <ul className="space-y-2">
@@ -159,8 +181,25 @@ export default function Sidebar({
               All Products
             </button>
           </li>
+
+          {categories.map((category) => (
+            <li key={category.id}>
+              <button
+                className={`flex w-full items-center justify-between py-1 text-left text-sm ${
+                  activeCategory === category.name
+                    ? 'font-semibold text-amber-600'
+                    : 'text-gray-600'
+                }`}
+                onClick={() => onCategoryChange(category.name)}
+              >
+                <span>{category.name}</span>
+                <span className="text-xs text-gray-400">({category.product_count})</span>
+              </button>
+            </li>
+          ))}
+
           {labels.map((label) => (
-            <li key={label.id}>
+            <li key={`label-${label.id}`}>
               <button
                 className={`w-full py-1 text-left text-sm ${
                   activeCategory === label.name ? 'font-semibold text-amber-600' : 'text-gray-600'
@@ -174,6 +213,7 @@ export default function Sidebar({
         </ul>
       </div>
 
+      {/* Price Filter */}
       <div className="border-t pt-6">
         <h2 className="mb-4 text-lg font-medium">Filter by</h2>
         <div className="mb-6">
