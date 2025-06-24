@@ -1,14 +1,15 @@
-// app/api/products/[id]/route.ts
+
+// GET - ดึงข้อมูลสินค้าตาม ID
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// GET - ดึงข้อมูลสินค้าตาม ID
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const productId = params.id;
+export async function GET(request: NextRequest) {
+  const url = new URL(request.url);
+  const productId = url.pathname.split('/').pop(); // ดึง id จาก path
 
+  try {
     const product = await prisma.product.findUnique({
       where: { product_id: productId },
       include: {
@@ -32,7 +33,6 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       );
     }
 
-    // แปลงข้อมูลให้เหมาะสมกับ Frontend
     const formattedProduct = {
       id: product.product_id,
       name: product.product_name,

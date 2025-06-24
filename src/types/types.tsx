@@ -6,15 +6,15 @@ interface ProductImage {
 }
 
 export type ProductType = {
-  id: number;
+  id: string;
   name: string;
   color: string;
   price_per_unit: number;
   net_price: number;
   description: string;
-  head_detail: string;
-  detail_product: string;
-  discount_percent: number;
+  head_detail?: string;
+  detail_product?: string;
+  discount_percent?: number;
   sale_status: boolean;
   category: {
     id: number;
@@ -24,11 +24,15 @@ export type ProductType = {
     id: number;
     name: string;
   };
-  images: ProductImage[]; // นี่คือส่วนสำคัญ
-  sizes: Array<{
+  images: {
+    id: number;
+    url: string;
+    position?: number;
+  }[];
+  sizes: {
     id: number;
     size: string;
     stock: number;
     status: string;
-  }>;
+  }[];
 };
