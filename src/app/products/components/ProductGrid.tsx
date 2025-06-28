@@ -33,12 +33,6 @@ export default function ProductGrid({ products }: ProductGridProps) {
     setIsDropdownOpen(false);
   };
 
-  // ฟังก์ชันคำนวณเปอร์เซ็นต์ส่วนลด
-  const calculateDiscountPercent = (originalPrice: number, netPrice: number): number => {
-    if (originalPrice <= 0 || netPrice >= originalPrice) return 0;
-    return Math.round(((originalPrice - netPrice) / originalPrice) * 100);
-  };
-
   // Sorting logic
   const sortedProducts = [...products];
 
@@ -51,7 +45,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
   } else if (sortOption === 'Name Z-A') {
     sortedProducts.sort((a, b) => b.name.localeCompare(a.name));
   } else if (sortOption === 'Newest') {
-    sortedProducts.sort((a, b) => b.id - a.id);
+    sortedProducts.sort((a, b) => Number(b.id) - Number(a.id));
   }
 
   return (
@@ -85,11 +79,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {sortedProducts.map((product) => {
-          // คำนวณเปอร์เซ็นต์ส่วนลดสำหรับแต่ละสินค้า
-          const discountPercent = calculateDiscountPercent(
-            product.price_per_unit,
-            product.net_price
-          );
+          const discountPercent = product.discount_percent || 0;
           const hasDiscount = discountPercent > 0;
 
           return (

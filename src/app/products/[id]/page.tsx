@@ -202,14 +202,14 @@ export default function ProductDetail() {
                 <span className="text-gray-400 line-through">
                   ฿{product.price_per_unit.toLocaleString()}
                 </span>
-                <span className="text-green-600">ลดราคา {product.discount_percent}%</span>
+                <span className="text-green-600">off {product.discount_percent}%</span>
               </>
             )}
           </div>
 
           {/* ขนาดรองเท้า */}
           <div className="mt-6">
-            <h3 className="mb-2 text-sm font-medium text-gray-700">เลือกขนาด</h3>
+            <h3 className="mb-2 text-sm font-medium text-gray-700">Select Size</h3>
             <div className="grid grid-cols-4 gap-3">
               {product.sizes.map((sizeObj) => {
                 const isOutOfStock = sizeObj.stock === 0;
@@ -237,16 +237,22 @@ export default function ProductDetail() {
               onClick={handleAddToCart}
               className="w-full rounded-3xl bg-black px-6 py-4 text-white"
             >
-              เพิ่มลงตะกร้า
+              Add to Bag
             </button>
 
             <button
               onClick={handleAddToWishlist}
               className="flex w-full items-center justify-center rounded-3xl border border-gray-300 bg-white px-8 py-4 text-black"
             >
-              <span className="mr-2">เพิ่มลงรายการโปรด</span>
+              <span className="mr-2">Favorite</span>
               <FaHeart className="text-bla" />
             </button>
+          </div>
+
+          {/* รายละเอียดเพิ่มเติม */}
+          <div className="mt-10 space-y-4">
+            <h2 className="text-lg font-semibold text-gray-800">Product Details</h2>
+            <p className="text-gray-600">{product.detail_product || 'ไม่มีรายละเอียดเพิ่มเติม'}</p>
           </div>
         </div>
       </div>
