@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
       detail_product: product.detail_product,
       discount_percent: product.discout_percent,
       sale_status: product.sale_status,
+      category_id: product.category.category_id, // ✅ เพิ่มบรรทัดนี้
       category: {
         id: product.category.category_id,
         name: product.category.category_name,

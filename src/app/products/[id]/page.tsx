@@ -20,6 +20,8 @@ export default function ProductDetail() {
   const [error, setError] = useState('');
   const [addedToCart, setAddedToCart] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [relatedProducts, setRelatedProducts] = useState<ProductType[]>([]);
+  const [loadingRelated, setLoadingRelated] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -29,8 +31,11 @@ export default function ProductDetail() {
         const data = res.data;
 
         if (data.success && data.data) {
-          setProduct(data.data); // ใช้ data.data เพราะ backend return { success, data: formattedProduct }
-          setSelectedSize(data.data.sizes?.[0]?.size || null); // ตั้ง size แรกที่เจอ
+          setProduct(data.data);
+          setSelectedSize(data.data.sizes?.[0]?.size || null);
+
+          // Fetch related products from same category
+          fetchRelatedProducts(data.data.category_id, data.data.id);
         } else {
           setError('Product not found');
         }
@@ -43,6 +48,31 @@ export default function ProductDetail() {
 
     if (params?.id) fetchProduct();
   }, [params]);
+
+  const fetchRelatedProducts = async (categoryId?: string, excludeId?: string | number) => {
+    try {
+      setLoadingRelated(true);
+      const res = await axios.get(
+        `/api/products?category=${categoryId}&limit=4&exclude=${excludeId}`
+      );
+
+      if (res.data.success && res.data.data) {
+        setRelatedProducts(res.data.data.slice(0, 4)); // จำกัดแค่ 4 รายการ
+      }
+    } catch (err) {
+      console.error('Error fetching related products:', err);
+      try {
+        const res = await axios.get(`/api/products?limit=4&exclude=${excludeId}`);
+        if (res.data.success && res.data.data) {
+          setRelatedProducts(res.data.data.slice(0, 4));
+        }
+      } catch (fallbackErr) {
+        console.error('Error fetching fallback products:', fallbackErr);
+      }
+    } finally {
+      setLoadingRelated(false);
+    }
+  };
 
   const handleSelectSize = (size: string) => setSelectedSize(size);
   const handleAddToCart = () => {
@@ -85,10 +115,8 @@ export default function ProductDetail() {
     );
   }
 
-  // ทำต่อใน UI ส่วนเดิมของคุณได้เลย
-
   return (
-    <div className="mx-auto px-8 py-6 sm:px-20">
+    <div className="mx-auto mt-10 px-8 py-6 sm:mt-0 sm:px-20">
       {/* Breadcrumb */}
       <nav className="mb-4 flex text-sm">
         <Link href="/" className="text-gray-500 hover:text-gray-700">
@@ -120,7 +148,7 @@ export default function ProductDetail() {
                   alt={product.name}
                   width={64}
                   height={64}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain"
                 />
               </div>
               <div>
@@ -197,7 +225,7 @@ export default function ProductDetail() {
           {/* ราคา */}
           <div className="mt-4 flex items-center space-x-3">
             <span className="text-xl font-bold">฿{product.net_price.toLocaleString()}</span>
-            {product.price_per_unit && (
+            {product.discount_percent && product.discount_percent > 0 && (
               <>
                 <span className="text-gray-400 line-through">
                   ฿{product.price_per_unit.toLocaleString()}
@@ -254,6 +282,68 @@ export default function ProductDetail() {
             <h2 className="text-lg font-semibold text-gray-800">Product Details</h2>
             <p className="text-gray-600">{product.detail_product || 'ไม่มีรายละเอียดเพิ่มเติม'}</p>
           </div>
+        </div>
+      </div>
+
+      {/* You Might Also Like Section */}
+      <div className="mt-16 border-t border-gray-200 pt-16">
+        <h2 className="mb-8 text-center text-2xl font-bold text-gray-900">You might also like</h2>
+
+        {loadingRelated ? (
+          <div className="flex justify-center py-8">
+            <div className="text-gray-500">Loading recommendations...</div>
+          </div>
+        ) : relatedProducts.length > 0 ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {relatedProducts.map((relatedProduct) => (
+              <Link
+                key={relatedProduct.id}
+                href={`/products/${relatedProduct.id}`}
+                className="group block"
+              >
+                <div className="aspect-[4/3] overflow-hidden rounded-lg bg-gray-100">
+                  <Image
+                    src={relatedProduct.images?.[0]?.url || '/placeholder.svg'}
+                    alt={relatedProduct.name}
+                    width={300}
+                    height={300}
+                    className="h-full w-full object-contain transition-transform duration-200 group-hover:scale-105"
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <h3 className="text-sm font-medium text-gray-900 group-hover:text-gray-700">
+                    {relatedProduct.name}
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-500">{relatedProduct.description}</p>
+                  <div className="mt-2 flex items-center space-x-2">
+                    <span className="text-sm font-bold text-gray-900">
+                      ฿{relatedProduct.net_price.toLocaleString()}
+                    </span>
+                    {relatedProduct.discount_percent && relatedProduct.discount_percent > 0 && (
+                      <span className="text-xs text-gray-400 line-through">
+                        ฿{relatedProduct.price_per_unit.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="flex justify-center py-8">
+            <div className="text-gray-500">No related products found</div>
+          </div>
+        )}
+
+        {/* View All Products Link */}
+        <div className="mt-12 text-center">
+          <Link
+            href="/products"
+            className="inline-block rounded-3xl border border-gray-300 px-8 py-3 text-sm font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-50"
+          >
+            View All Products
+          </Link>
         </div>
       </div>
     </div>

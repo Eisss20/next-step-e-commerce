@@ -11,14 +11,15 @@ export async function GET(request: NextRequest) {
 
     // เก็บค่าพารามิเตอร์ที่ใช้กรอง
     const category_id = searchParams.get('category_id');
+    const category = searchParams.get('category'); // รองรับทั้ง category_id และ category
     const label_id = searchParams.get('label_id');
     const min_price = searchParams.get('min_price');
     const max_price = searchParams.get('max_price');
     const search = searchParams.get('search');
     const sale_status = searchParams.get('sale_status');
+    const exclude = searchParams.get('exclude'); // เพิ่มพารามิเตอร์ exclude
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
-    //แปลงค่า page กับ limit เป็นตัวเลข (default: หน้า 1, 10 รายการต่อหน้า)
 
     // คำนวณ offset สำหรับ pagination
     const skip = (page - 1) * limit;
@@ -26,11 +27,14 @@ export async function GET(request: NextRequest) {
     // สร้างเงื่อนไขการกรอง
     const where: any = {};
 
-    if (category_id) {
+    // รองรับทั้ง category_id และ category
+    if (category_id && category_id !== 'undefined' && !isNaN(parseInt(category_id))) {
       where.category_id = parseInt(category_id);
+    } else if (category && category !== 'undefined' && !isNaN(parseInt(category))) {
+      where.category_id = parseInt(category);
     }
 
-    if (label_id) {
+    if (label_id && label_id !== 'undefined' && !isNaN(parseInt(label_id))) {
       where.label_id = parseInt(label_id);
     }
 
@@ -51,6 +55,16 @@ export async function GET(request: NextRequest) {
     if (sale_status) {
       where.sale_status = sale_status === 'true';
     }
+
+    if (exclude && exclude !== 'undefined') {
+      const parsedId = parseInt(exclude);
+      if (!isNaN(parsedId)) {
+        where.product_id = { not: parsedId };
+      } else {
+        where.product_name = { not: exclude }; // fallback ถ้าเป็น string ID
+      }
+    }
+    
 
     // ดึงข้อมูลสินค้าจากฐานข้อมูล
     const products = await prisma.product.findMany({
@@ -88,6 +102,7 @@ export async function GET(request: NextRequest) {
       detail_product: product.detail_product,
       discount_percent: product.discout_percent,
       sale_status: product.sale_status,
+      category_id: product.category_id, // เพิ่ม category_id
       category: {
         id: product.category.category_id,
         name: product.category.category_name,

@@ -1,3 +1,5 @@
+
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -165,10 +167,10 @@ export default function Sidebar({
       </nav>
 
       {/* Page Title */}
-      <h1 className="mb-8 text-3xl font-bold">{getMainCategoryDisplay(mainCategoryParam)}</h1>
+      <h1 className="mt-8 mb-8 text-3xl font-bold">{getMainCategoryDisplay(mainCategoryParam)}</h1>
 
-      {/* Category Filter */}
-      <div className="mb-8">
+      {/* Category Filter - Hidden on mobile */}
+      <div className="mb-8 hidden md:block">
         <h2 className="mb-4 text-lg font-medium">Browse by</h2>
         <ul className="space-y-2">
           <li>
@@ -213,8 +215,8 @@ export default function Sidebar({
         </ul>
       </div>
 
-      {/* Price Filter */}
-      <div className="border-t pt-6">
+      {/* Price Filter - Hidden on mobile */}
+      <div className="hidden border-t pt-6 md:block">
         <h2 className="mb-4 text-lg font-medium">Filter by</h2>
         <div className="mb-6">
           <h3 className="mb-4 flex justify-between text-sm font-medium">

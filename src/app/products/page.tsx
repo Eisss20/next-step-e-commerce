@@ -31,6 +31,10 @@ export default function ProductsPage() {
           axios.get('/api/categories'),
         ]);
 
+        // ดูข้อมูลที่ได้จาก API
+        console.log('productsRes:', productsRes.data);
+        console.log('categoriesRes:', categoriesRes.data);
+
         // Handle products response
         if (productsRes.data) {
           if (productsRes.data.success && Array.isArray(productsRes.data.data)) {
@@ -217,8 +221,8 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="mx-auto py-12 sm:px-20">
-      <div className="flex flex-col gap-10 md:flex-row">
+    <div className="mx-auto px-6 py-12 sm:px-10">
+      <div className="sm:gap-10 flex flex-col md:flex-row">
         <Sidebar
           priceRange={priceRange}
           onPriceChange={handlePriceChange}
