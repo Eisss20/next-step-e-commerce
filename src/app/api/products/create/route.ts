@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { CreateProductBody, ProductImageInput, APIResponse } from '@/types/types';
 
 const prisma = new PrismaClient();
 
 // POST - สร้างสินค้าใหม่
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body: CreateProductBody = await request.json();
 
-    // ตรวจสอบข้อมูลที่จำเป็น
-    const requiredFields = [
+    // ตรวจสอบข้อมูลที่จำเป็น - แก้ไขแล้ว
+    const requiredFields: string[] = [
       'product_id',
       'product_name',
       'color_name',
@@ -23,8 +24,8 @@ export async function POST(request: NextRequest) {
     ];
 
     for (const field of requiredFields) {
-      if (!body[field]) {
-        return NextResponse.json(
+      if (!body[field as keyof CreateProductBody]) {
+        return NextResponse.json<APIResponse>(
           { success: false, message: `ข้อมูล ${field} เป็นข้อมูลที่จำเป็น` },
           { status: 400 }
         );
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingProduct) {
-      return NextResponse.json(
+      return NextResponse.json<APIResponse>(
         { success: false, message: 'รหัสสินค้านี้มีอยู่ในระบบแล้ว' },
         { status: 400 }
       );
@@ -50,14 +51,14 @@ export async function POST(request: NextRequest) {
     ]);
 
     if (!category) {
-      return NextResponse.json(
+      return NextResponse.json<APIResponse>(
         { success: false, message: 'ไม่พบหมวดหมู่ที่ระบุ' },
         { status: 400 }
       );
     }
 
     if (!label) {
-      return NextResponse.json(
+      return NextResponse.json<APIResponse>(
         { success: false, message: 'ไม่พบป้ายกำกับที่ระบุ' },
         { status: 400 }
       );
@@ -88,7 +89,7 @@ export async function POST(request: NextRequest) {
     // เพิ่มรูปภาพสินค้า (ถ้ามี)
     if (body.images && Array.isArray(body.images)) {
       await prisma.product_image.createMany({
-        data: body.images.map((img: any, index: number) => ({
+        data: body.images.map((img: ProductImageInput, index: number) => ({
           product_id: newProduct.product_id,
           product_image_url: img.url,
           position_image: img.position || index + 1,
@@ -118,7 +119,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(
+    return NextResponse.json<APIResponse>(
       {
         success: true,
         message: 'สร้างสินค้าเรียบร้อยแล้ว',
@@ -128,7 +129,7 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error('Error creating product:', error);
-    return NextResponse.json(
+    return NextResponse.json<APIResponse>(
       { success: false, message: 'เกิดข้อผิดพลาดในการสร้างสินค้า' },
       { status: 500 }
     );

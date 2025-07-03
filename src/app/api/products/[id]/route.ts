@@ -1,4 +1,3 @@
-
 // GET - ดึงข้อมูลสินค้าตาม ID
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
@@ -82,9 +81,10 @@ export async function GET(request: NextRequest) {
 }
 
 // PUT - อัปเดตข้อมูลสินค้า
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    const productId = params.id;
+    // Await the params since they are now asynchronous
+    const { id: productId } = await context.params;
     const body = await request.json();
 
     // ตรวจสอบว่าสินค้าที่ต้องการอัปเดตมีอยู่หรือไม่
@@ -140,9 +140,14 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // DELETE - ลบสินค้า
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const productId = params.id;
+    // ต้อง await params ก่อนใช้งาน
+    const { id } = await params;
+    const productId = id;
 
     // ตรวจสอบว่าสินค้าที่ต้องการลบมีอยู่หรือไม่
     const existingProduct = await prisma.product.findUnique({

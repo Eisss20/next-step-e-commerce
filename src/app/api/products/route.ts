@@ -1,6 +1,6 @@
 // app/api/products/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient,Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     // สร้างเงื่อนไขการกรอง
-    const where: any = {};
+    const where: Prisma.productWhereInput = {};
 
     // รองรับทั้ง category_id และ category
     if (category_id && category_id !== 'undefined' && !isNaN(parseInt(category_id))) {
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
     if (exclude && exclude !== 'undefined') {
       const parsedId = parseInt(exclude);
       if (!isNaN(parsedId)) {
-        where.product_id = { not: parsedId };
+        where.product_id = { not: exclude };
       } else {
         where.product_name = { not: exclude }; // fallback ถ้าเป็น string ID
       }

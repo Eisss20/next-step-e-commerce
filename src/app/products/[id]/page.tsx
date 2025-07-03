@@ -12,7 +12,6 @@ import { ProductType } from '@/types/types';
 
 export default function ProductDetail() {
   const params = useParams();
-  const productId = params?.id;
 
   const [product, setProduct] = useState<ProductType | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -34,13 +33,12 @@ export default function ProductDetail() {
           setProduct(data.data);
           setSelectedSize(data.data.sizes?.[0]?.size || null);
 
-          // Fetch related products from same category
           fetchRelatedProducts(data.data.category_id, data.data.id);
         } else {
-          setError('Product not found');
+          setError('Product not found.');
         }
-      } catch (err) {
-        setError('Error fetching product');
+      } catch {
+        setError('Failed to fetch product.');
       } finally {
         setLoading(false);
       }
@@ -57,17 +55,17 @@ export default function ProductDetail() {
       );
 
       if (res.data.success && res.data.data) {
-        setRelatedProducts(res.data.data.slice(0, 4)); // จำกัดแค่ 4 รายการ
+        setRelatedProducts(res.data.data.slice(0, 4));
       }
-    } catch (err) {
-      console.error('Error fetching related products:', err);
+    } catch {
+      console.error('Failed to fetch related products.');
       try {
         const res = await axios.get(`/api/products?limit=4&exclude=${excludeId}`);
         if (res.data.success && res.data.data) {
           setRelatedProducts(res.data.data.slice(0, 4));
         }
-      } catch (fallbackErr) {
-        console.error('Error fetching fallback products:', fallbackErr);
+      } catch {
+        console.error('Failed to fetch fallback products.');
       }
     } finally {
       setLoadingRelated(false);
@@ -77,14 +75,14 @@ export default function ProductDetail() {
   const handleSelectSize = (size: string) => setSelectedSize(size);
   const handleAddToCart = () => {
     if (!selectedSize) {
-      alert('โปรดเลือกขนาดรองเท้า');
+      alert('Please select a size.');
       return;
     }
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 3000);
   };
 
-  const handleAddToWishlist = () => alert('เพิ่มลงรายการโปรดแล้ว');
+  const handleAddToWishlist = () => alert('Added to favorites.');
 
   const handlePrevImage = () => {
     if (!product?.images?.length) return;
@@ -98,8 +96,6 @@ export default function ProductDetail() {
 
   const handleThumbnailClick = (index: number) => setCurrentImageIndex(index);
 
-  const availableSizes = ['5', '6', '7', '8', '9', '10', '11', '12'];
-
   if (loading) {
     return <div className="flex h-screen items-center justify-center">Loading...</div>;
   }
@@ -107,9 +103,9 @@ export default function ProductDetail() {
   if (error || !product) {
     return (
       <div className="flex h-screen flex-col items-center justify-center">
-        <h1 className="mb-4 text-2xl">{error || 'ไม่พบสินค้าที่คุณต้องการ'}</h1>
+        <h1 className="mb-4 text-2xl">{error || 'Product not found.'}</h1>
         <Link href="/products" className="text-amber-600 hover:underline">
-          กลับไปหน้าสินค้า
+          Back to Products
         </Link>
       </div>
     );
@@ -130,7 +126,7 @@ export default function ProductDetail() {
         <span className="text-gray-700">{product.name}</span>
       </nav>
 
-      {/* แจ้งเตือนเพิ่มลงตะกร้า */}
+      {/* Add to Cart Notification */}
       {addedToCart && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-20">
           <div className="relative w-full max-w-md rounded-lg bg-white p-4 shadow-lg">
@@ -154,7 +150,7 @@ export default function ProductDetail() {
               <div>
                 <h3 className="text-lg font-medium">{product.name}</h3>
                 <p className="text-sm text-gray-600">{product.description}</p>
-                <p className="text-sm">ไซด์ {selectedSize}</p>
+                <p className="text-sm">Size: {selectedSize}</p>
                 <p className="text-sm font-semibold">฿{product.net_price.toLocaleString()}</p>
               </div>
             </div>
@@ -164,7 +160,7 @@ export default function ProductDetail() {
                 className="w-full rounded-none bg-black py-3 text-white"
                 onClick={() => setAddedToCart(false)}
               >
-                ปิดการแจ้งเตือน
+                Close Notification
               </button>
             </div>
           </div>
@@ -172,7 +168,7 @@ export default function ProductDetail() {
       )}
 
       <div className="grid h-full gap-20 md:grid-cols-2">
-        {/* ภาพสินค้า */}
+        {/* Product Images */}
         <div className="relative">
           <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
             <Image
@@ -181,7 +177,6 @@ export default function ProductDetail() {
               fill
               className="object-cover"
             />
-
             <button
               onClick={handlePrevImage}
               className="absolute top-1/2 left-2 -translate-y-1/2 rounded-full bg-white/60 p-2"
@@ -196,7 +191,7 @@ export default function ProductDetail() {
             </button>
           </div>
 
-          {/* Thumbnail */}
+          {/* Thumbnails */}
           <div className="grid grid-cols-8 gap-2">
             {product.images.map((img, index) => (
               <div
@@ -217,12 +212,12 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        {/* รายละเอียดสินค้า */}
+        {/* Product Details */}
         <div className="relative w-full max-w-max">
           <h1 className="text-2xl font-bold text-gray-900">{product.name}</h1>
           <p className="mt-1 text-lg text-gray-600">{product.description}</p>
 
-          {/* ราคา */}
+          {/* Price */}
           <div className="mt-4 flex items-center space-x-3">
             <span className="text-xl font-bold">฿{product.net_price.toLocaleString()}</span>
             {product.discount_percent && product.discount_percent > 0 && (
@@ -235,7 +230,7 @@ export default function ProductDetail() {
             )}
           </div>
 
-          {/* ขนาดรองเท้า */}
+          {/* Sizes */}
           <div className="mt-6">
             <h3 className="mb-2 text-sm font-medium text-gray-700">Select Size</h3>
             <div className="grid grid-cols-4 gap-3">
@@ -259,7 +254,7 @@ export default function ProductDetail() {
             </div>
           </div>
 
-          {/* ปุ่มการกระทำ */}
+          {/* Actions */}
           <div className="mt-10 flex flex-col items-center space-y-4 px-10">
             <button
               onClick={handleAddToCart}
@@ -277,15 +272,17 @@ export default function ProductDetail() {
             </button>
           </div>
 
-          {/* รายละเอียดเพิ่มเติม */}
+          {/* More Details */}
           <div className="mt-10 space-y-4">
             <h2 className="text-lg font-semibold text-gray-800">Product Details</h2>
-            <p className="text-gray-600">{product.detail_product || 'ไม่มีรายละเอียดเพิ่มเติม'}</p>
+            <p className="text-gray-600">
+              {product.detail_product || 'No additional information.'}
+            </p>
           </div>
         </div>
       </div>
 
-      {/* You Might Also Like Section */}
+      {/* Related Products */}
       <div className="mt-16 border-t border-gray-200 pt-16">
         <h2 className="mb-8 text-center text-2xl font-bold text-gray-900">You might also like</h2>
 
@@ -332,11 +329,10 @@ export default function ProductDetail() {
           </div>
         ) : (
           <div className="flex justify-center py-8">
-            <div className="text-gray-500">No related products found</div>
+            <div className="text-gray-500">No related products found.</div>
           </div>
         )}
 
-        {/* View All Products Link */}
         <div className="mt-12 text-center">
           <Link
             href="/products"

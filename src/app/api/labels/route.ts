@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// GET - ดึงข้อมูลป้ายกำกับทั้งหมด
+// GET - Fetch all labels
 export async function GET() {
   try {
     const labels = await prisma.label.findMany({
@@ -18,7 +18,7 @@ export async function GET() {
     const formattedLabels = labels.map((label) => ({
       id: label.label_id,
       name: label.label_name,
-      product_count: label._count.products,
+      productCount: label._count.products,
     }));
 
     return NextResponse.json({
@@ -26,9 +26,15 @@ export async function GET() {
       data: formattedLabels,
     });
   } catch (error) {
-    console.error('Error fetching labels:', error);
+    console.error(
+      'Error fetching labels:',
+      error && typeof error === 'object' ? error : String(error)
+    );
     return NextResponse.json(
-      { success: false, message: 'เกิดข้อผิดพลาดในการดึงข้อมูลป้ายกำกับ' },
+      {
+        success: false,
+        message: 'An error occurred while fetching labels.',
+      },
       { status: 500 }
     );
   } finally {
@@ -36,26 +42,31 @@ export async function GET() {
   }
 }
 
-// POST - สร้างป้ายกำกับใหม่
+// POST - Create a new label
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
     if (!body.label_name) {
       return NextResponse.json(
-        { success: false, message: 'ชื่อป้ายกำกับเป็นข้อมุลที่จำเป็น' },
+        {
+          success: false,
+          message: 'Label name is required.',
+        },
         { status: 400 }
       );
     }
 
-    // ตรวจสอบว่าชื่อป้ายกำกับซ้ำหรือไม่
     const existingLabel = await prisma.label.findUnique({
       where: { label_name: body.label_name },
     });
 
     if (existingLabel) {
       return NextResponse.json(
-        { success: false, message: 'ชื่อป้ายกำกับนี้มีอยู่ในระบบแล้ว' },
+        {
+          success: false,
+          message: 'This label name already exists.',
+        },
         { status: 400 }
       );
     }
@@ -67,15 +78,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: true,
-        message: 'สร้างป้ายกำกับเรียบร้อยแล้ว',
+        message: 'Label created successfully.',
         data: newLabel,
       },
       { status: 201 }
     );
   } catch (error) {
-    console.error('Error creating label:', error);
+    console.error(
+      'Error creating label:',
+      error && typeof error === 'object' ? error : String(error)
+    );
     return NextResponse.json(
-      { success: false, message: 'เกิดข้อผิดพลาดในการสร้างป้ายกำกับ' },
+      {
+        success: false,
+        message: 'An error occurred while creating the label.',
+      },
       { status: 500 }
     );
   } finally {

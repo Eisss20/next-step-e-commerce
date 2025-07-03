@@ -62,7 +62,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
           </button>
 
           {isDropdownOpen && (
-            <div className="absolute right-0 z-10 mt-1 w-56 rounded-sm border bg-white shadow-lg">
+            <div className="absolute right-0 z-10 mt-1 w-56 rounded-sm border bg-white border-gray-200 shadow-sm">
               {sortOptions.map((option) => (
                 <button
                   key={option}
@@ -77,53 +77,61 @@ export default function ProductGrid({ products }: ProductGridProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {sortedProducts.map((product) => {
-          const discountPercent = product.discount_percent || 0;
-          const hasDiscount = discountPercent > 0;
+      {sortedProducts.length === 0 ? (
+        <div className="flex items-center justify-center py-20">
+          <p className="text-center text-gray-500">No products found.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {sortedProducts.map((product) => {
+            const discountPercent = product.discount_percent || 0;
+            const hasDiscount = discountPercent > 0;
 
-          return (
-            <div key={product.id} className="group relative">
-              <Link href={`/products/${product.id}`} className="block">
-                <div className="relative aspect-[6/8] overflow-hidden rounded-lg bg-gray-100">
-                  {/* ป้าย BEST SELLER และ SALE */}
-                  {product.label?.name === 'Best Sellers' && (
-                    <div className="absolute top-2 left-2 z-10 rounded bg-yellow-400 px-2 py-1 text-xs font-semibold">
-                      BEST SELLER
-                    </div>
-                  )}
-                  {product.label?.name === 'Sale' && (
-                    <div className="absolute top-2 left-2 z-10 rounded bg-red-500 px-2 py-1 text-xs font-semibold text-white">
-                      SALE
-                    </div>
-                  )}
-
-                  <Image
-                    src={product.images[0]?.url || '/placeholder.svg'}
-                    alt={product.name}
-                    fill
-                    className="object-contain transition-transform duration-300 group-hover:scale-105"
-                  />
-                </div>
-              </Link>
-              <div className="mt-4">
+            return (
+              <div key={product.id} className="group relative">
                 <Link href={`/products/${product.id}`} className="block">
-                  <h3 className="text-sm font-medium hover:underline">{product.name}</h3>
-                </Link>
-                <p className="mt-1 text-sm font-semibold">฿{product.net_price.toLocaleString()}</p>
-                {hasDiscount && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-400 line-through">
-                      ฿{product.price_per_unit.toLocaleString()}
-                    </span>
-                    <span className="text-xs text-green-600">-{discountPercent}%</span>
+                  <div className="relative aspect-[6/8] overflow-hidden rounded-lg bg-gray-100">
+                    {/* ป้าย BEST SELLER และ SALE */}
+                    {product.label?.name === 'Best Sellers' && (
+                      <div className="absolute top-2 left-2 z-10 rounded bg-yellow-400 px-2 py-1 text-xs font-semibold">
+                        BEST SELLER
+                      </div>
+                    )}
+                    {product.label?.name === 'Sale' && (
+                      <div className="absolute top-2 left-2 z-10 rounded bg-red-500 px-2 py-1 text-xs font-semibold text-white">
+                        SALE
+                      </div>
+                    )}
+
+                    <Image
+                      src={product.images[0]?.url || '/placeholder.svg'}
+                      alt={product.name}
+                      fill
+                      className="object-contain transition-transform duration-300 group-hover:scale-105"
+                    />
                   </div>
-                )}
+                </Link>
+                <div className="mt-4">
+                  <Link href={`/products/${product.id}`} className="block">
+                    <h3 className="text-sm font-medium hover:underline">{product.name}</h3>
+                  </Link>
+                  <p className="mt-1 text-sm font-semibold">
+                    ฿{product.net_price.toLocaleString()}
+                  </p>
+                  {hasDiscount && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-400 line-through">
+                        ฿{product.price_per_unit.toLocaleString()}
+                      </span>
+                      <span className="text-xs text-green-600">-{discountPercent}%</span>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

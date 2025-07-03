@@ -90,7 +90,7 @@ export default function MobileSidebar({ isOpen, toggleSidebar }: MobileSidebarPr
           </Link>
           <Link
             href="/about"
-            className="text-lg font-semibold text-gray-900 transition-colors "
+            className="text-lg font-semibold text-gray-900 transition-colors"
             onClick={toggleSidebar}
           >
             About
@@ -100,7 +100,7 @@ export default function MobileSidebar({ isOpen, toggleSidebar }: MobileSidebarPr
           <div className="relative">
             <button
               onClick={toggleShopDropdown}
-              className="flex w-full items-center justify-between text-lg font-semibold text-gray-900 transition-colors "
+              className="flex w-full items-center justify-between text-lg font-semibold text-gray-900 transition-colors"
               aria-expanded={isShopDropdownOpen}
             >
               Shop
@@ -139,19 +139,19 @@ export default function MobileSidebar({ isOpen, toggleSidebar }: MobileSidebarPr
                   className="block w-full cursor-pointer py-2 text-left text-base text-gray-700 transition-colors hover:text-yellow-600"
                   onClick={() => handleNavigation('/products?mainCategory=men')}
                 >
-                  MEN'S COLLECTION
+                  MEN&#39;S COLLECTION
                 </button>
                 <button
                   className="block w-full cursor-pointer py-2 text-left text-base text-gray-700 transition-colors hover:text-yellow-600"
                   onClick={() => handleNavigation('/products?mainCategory=women')}
                 >
-                  WOMEN'S COLLECTION
+                  WOMEN&#39;S COLLECTION
                 </button>
                 <button
                   className="block w-full cursor-pointer py-2 text-left text-base text-gray-700 transition-colors hover:text-yellow-600"
                   onClick={() => handleNavigation('/products?mainCategory=kids')}
                 >
-                  KIDS' COLLECTION
+                  KIDS&#39; COLLECTION
                 </button>
               </div>
             </div>
@@ -161,3 +161,4 @@ export default function MobileSidebar({ isOpen, toggleSidebar }: MobileSidebarPr
     </>
   );
 }
+  

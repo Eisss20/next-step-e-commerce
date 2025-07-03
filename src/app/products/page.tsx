@@ -13,7 +13,7 @@ export default function ProductsPage() {
   const categoryParam = searchParams.get('category');
 
   const [products, setProducts] = useState<ProductType[]>([]);
-  const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
+  const [, setCategories] = useState<{ id: number; name: string }[]>([]);
   const [priceRange, setPriceRange] = useState<number[]>([0, 300]);
   const [activeCategory, setActiveCategory] = useState<string>('All Products');
   const [activeMainCategory, setActiveMainCategory] = useState<string>('all');
@@ -174,21 +174,6 @@ export default function ProductsPage() {
 
     return priceMatch && mainCategoryMatch && categoryMatch;
   });
-
-  const getPageTitle = (): string => {
-    switch (activeMainCategory) {
-      case 'new':
-        return 'New Arrivals';
-      case 'men':
-        return "Men's Collection";
-      case 'women':
-        return "Women's Collection";
-      case 'kids':
-        return 'Kids Collection';
-      default:
-        return 'All Products';
-    }
-  };
 
   if (loading) {
     return (

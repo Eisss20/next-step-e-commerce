@@ -1,13 +1,13 @@
-// app/api/products/[id]/images/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 // GET - ดึงรูปภาพของสินค้าตาม product_id
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const productId = params.id;
+    // Await the params since they are now asynchronous
+    const { id: productId } = await params;
 
     // ตรวจสอบว่าสินค้ามีอยู่หรือไม่
     const product = await prisma.product.findUnique({
@@ -51,9 +51,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // POST - เพิ่มรูปภาพใหม่ให้สินค้า
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const productId = params.id;
+    // Await the params since they are now asynchronous
+    const { id: productId } = await params;
     const body = await request.json();
 
     // ตรวจสอบว่าสินค้ามีอยู่หรือไม่
