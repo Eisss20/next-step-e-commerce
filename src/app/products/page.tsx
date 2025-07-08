@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { ProductType } from '@/types/types';
 import Sidebar from './components/Sidebar';
 import ProductGrid from './components/ProductGrid';
 
-export default function ProductsPage() {
+function ProductsPageContent() {
   const searchParams = useSearchParams();
   const mainCategoryParam = searchParams.get('mainCategory');
   const categoryParam = searchParams.get('category');
@@ -25,17 +25,11 @@ export default function ProductsPage() {
       try {
         setLoading(true);
 
-        // Fetch products and categories in parallel
         const [productsRes, categoriesRes] = await Promise.all([
           axios.get('/api/products'),
           axios.get('/api/categories'),
         ]);
 
-        // ดูข้อมูลที่ได้จาก API
-        console.log('productsRes:', productsRes.data);
-        console.log('categoriesRes:', categoriesRes.data);
-
-        // Handle products response
         if (productsRes.data) {
           if (productsRes.data.success && Array.isArray(productsRes.data.data)) {
             setProducts(productsRes.data.data);
@@ -54,7 +48,6 @@ export default function ProductsPage() {
           setError('No data received from API');
         }
 
-        // Handle categories response
         if (categoriesRes.data.success) {
           setCategories(categoriesRes.data.data);
         }
@@ -93,21 +86,17 @@ export default function ProductsPage() {
     setActiveCategory(category);
   };
 
-  // Helper function to normalize category name for comparison
   const normalizeCategoryName = (categoryName: string): string => {
     return categoryName.toLowerCase().trim();
   };
 
-  // Helper function to check if product matches main category
   const productMatchesMainCategory = (product: ProductType, mainCategory: string): boolean => {
     if (mainCategory === 'all') return true;
 
-    // Check category field
     if (product.category && typeof product.category === 'object' && 'name' in product.category) {
       const categoryName = normalizeCategoryName(product.category.name);
       const targetCategory = normalizeCategoryName(mainCategory);
 
-      // Map URL parameters to actual category names
       const categoryMap: { [key: string]: string[] } = {
         new: ['new arrival', 'new arrivals', 'new'],
         women: ['women', 'woman'],
@@ -122,7 +111,6 @@ export default function ProductsPage() {
       return categoryName === targetCategory;
     }
 
-    // Check label field as fallback
     if (product.label && typeof product.label === 'object' && 'name' in product.label) {
       const labelName = normalizeCategoryName(product.label.name);
       const targetCategory = normalizeCategoryName(mainCategory);
@@ -145,23 +133,16 @@ export default function ProductsPage() {
   };
 
   const filteredProducts: ProductType[] = products.filter((product) => {
-    // Price filter
     const priceMatch = product.net_price >= priceRange[0] && product.net_price <= priceRange[1];
-
-    // Main category filter (New, Women, Men, Kids)
     const mainCategoryMatch = productMatchesMainCategory(product, activeMainCategory);
 
-    // Sub-category filter (All Products, Best Seller, Sale, etc.)
     let categoryMatch = false;
     if (activeCategory === 'All Products') {
       categoryMatch = true;
     } else {
-      // Check if the product matches the selected sub-category
       if (product.category && typeof product.category === 'object' && 'name' in product.category) {
         categoryMatch = product.category.name === activeCategory;
       }
-
-      // Also check label field for categories like "Best Seller", "Sale", etc.
       if (
         !categoryMatch &&
         product.label &&
@@ -217,5 +198,13 @@ export default function ProductsPage() {
         <ProductGrid products={filteredProducts} />
       </div>
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="mx-auto py-12 sm:px-20"><div className="flex min-h-[400px] items-center justify-center"><div className="text-lg">Loading products...</div></div></div>}>
+      <ProductsPageContent />
+    </Suspense>
   );
 }
