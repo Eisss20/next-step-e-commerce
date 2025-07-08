@@ -9,9 +9,11 @@ import { IoMdClose } from 'react-icons/io';
 import { FaHeart } from 'react-icons/fa';
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
 import { ProductType } from '@/types/types';
+import { useCart } from '../../context/cartcontext';
 
 export default function ProductDetail() {
   const params = useParams();
+  const { addToCart } = useCart();
 
   const [product, setProduct] = useState<ProductType | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -32,9 +34,7 @@ export default function ProductDetail() {
 
         if (data.success && data.data) {
           setProduct(data.data);
-          // ไม่ตั้งค่าเริ่มต้นให้กับ selectedSize ให้ user เลือกเอง
           setSelectedSize(null);
-
           fetchRelatedProducts(data.data.category_id, data.data.id);
         } else {
           setError('Product not found.');
@@ -76,22 +76,34 @@ export default function ProductDetail() {
 
   const handleSelectSize = (size: string) => {
     setSelectedSize(size);
-    // ซ่อนข้อความแจ้งเตือนเมื่อเลือกไซต์
     setShowSizeError(false);
   };
 
   const handleAddToCart = () => {
     if (!selectedSize) {
       setShowSizeError(true);
-      // ซ่อนข้อความแจ้งเตือนหลังจาก 3 วินาที
       setTimeout(() => setShowSizeError(false), 3000);
       return;
     }
+
+    if (!product) return;
+
+    // เพิ่มสินค้าเข้าตะกร้าผ่าน Context
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.net_price,
+      image: product.images?.[0]?.url || '/placeholder.svg',
+      size: selectedSize,
+    });
+
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 3000);
   };
 
-  const handleAddToWishlist = () => alert('Added to favorites.');
+  const handleAddToWishlist = () => {
+    console.log('Added to favorites');
+  };
 
   const handlePrevImage = () => {
     if (!product?.images?.length) return;
@@ -135,10 +147,10 @@ export default function ProductDetail() {
         <span className="text-gray-700">{product.name}</span>
       </nav>
 
-      {/* Add to Cart Notification */}
+      {/* Add to Cart Success Notification */}
       {addedToCart && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-20">
-          <div className="relative w-full max-w-md rounded-lg bg-white p-4 shadow-lg">
+          <div className="relative w-full max-w-md rounded-lg border border-gray-200 bg-white p-4 shadow-lg">
             <button
               onClick={() => setAddedToCart(false)}
               className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
@@ -157,27 +169,32 @@ export default function ProductDetail() {
                 />
               </div>
               <div>
-                <h3 className="text-lg font-medium">{product.name}</h3>
+                <h3 className="text-lg font-medium text-green-600">Added to Cart!</h3>
+                <p className="text-sm font-medium">{product.name}</p>
                 <p className="text-sm text-gray-600">{product.description}</p>
                 <p className="text-sm">Size: {selectedSize}</p>
                 <p className="text-sm font-semibold">฿{product.net_price.toLocaleString()}</p>
               </div>
             </div>
 
-            <div className="mt-4">
+            <div className="mt-4 flex space-x-2">
               <button
-                className="w-full rounded-none bg-black py-3 text-white"
+                className="flex-1 rounded-lg border border-gray-300 py-2 text-gray-700 hover:bg-gray-50"
                 onClick={() => setAddedToCart(false)}
               >
-                Close Notification
+                Continue Shopping
               </button>
+              <Link
+                href="/cart"
+                className="flex-1 rounded-lg bg-black py-2 text-center text-white hover:bg-gray-800"
+                onClick={() => setAddedToCart(false)}
+              >
+                View Cart
+              </Link>
             </div>
           </div>
         </div>
       )}
-
-      {/* Size Selection Error Notification */}
-      {/* Modal แจ้งเตือนถูกลบออก */}
 
       <div className="grid h-full gap-20 md:grid-cols-2">
         {/* Product Images */}
@@ -287,7 +304,7 @@ export default function ProductDetail() {
               className="flex w-full items-center justify-center rounded-3xl border border-gray-300 bg-white px-8 py-4 text-black hover:bg-gray-50"
             >
               <span className="mr-2">Favorite</span>
-              <FaHeart className="text-bla" />
+              <FaHeart className="text-black" />
             </button>
           </div>
 
