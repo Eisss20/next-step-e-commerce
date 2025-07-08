@@ -21,6 +21,7 @@ export default function ProductDetail() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [relatedProducts, setRelatedProducts] = useState<ProductType[]>([]);
   const [loadingRelated, setLoadingRelated] = useState(false);
+  const [showSizeError, setShowSizeError] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -31,7 +32,8 @@ export default function ProductDetail() {
 
         if (data.success && data.data) {
           setProduct(data.data);
-          setSelectedSize(data.data.sizes?.[0]?.size || null);
+          // ไม่ตั้งค่าเริ่มต้นให้กับ selectedSize ให้ user เลือกเอง
+          setSelectedSize(null);
 
           fetchRelatedProducts(data.data.category_id, data.data.id);
         } else {
@@ -72,10 +74,17 @@ export default function ProductDetail() {
     }
   };
 
-  const handleSelectSize = (size: string) => setSelectedSize(size);
+  const handleSelectSize = (size: string) => {
+    setSelectedSize(size);
+    // ซ่อนข้อความแจ้งเตือนเมื่อเลือกไซต์
+    setShowSizeError(false);
+  };
+
   const handleAddToCart = () => {
     if (!selectedSize) {
-      alert('Please select a size.');
+      setShowSizeError(true);
+      // ซ่อนข้อความแจ้งเตือนหลังจาก 3 วินาที
+      setTimeout(() => setShowSizeError(false), 3000);
       return;
     }
     setAddedToCart(true);
@@ -167,6 +176,9 @@ export default function ProductDetail() {
         </div>
       )}
 
+      {/* Size Selection Error Notification */}
+      {/* Modal แจ้งเตือนถูกลบออก */}
+
       <div className="grid h-full gap-20 md:grid-cols-2">
         {/* Product Images */}
         <div className="relative">
@@ -232,7 +244,12 @@ export default function ProductDetail() {
 
           {/* Sizes */}
           <div className="mt-6">
-            <h3 className="mb-2 text-sm font-medium text-gray-700">Select Size</h3>
+            <h3 className="mb-2 text-sm font-medium text-gray-700">
+              Select Size {showSizeError && <span className="text-red-500">*</span>}
+            </h3>
+            {showSizeError && (
+              <p className="mb-2 text-sm text-red-500">Please select a size to continue.</p>
+            )}
             <div className="grid grid-cols-4 gap-3">
               {product.sizes.map((sizeObj) => {
                 const isOutOfStock = sizeObj.stock === 0;
@@ -244,7 +261,9 @@ export default function ProductDetail() {
                     className={`border px-3 py-2 text-sm transition-all duration-200 ${
                       selectedSize === sizeObj.size
                         ? 'border-black bg-black text-white'
-                        : 'border-gray-300 text-gray-700 hover:border-black'
+                        : showSizeError
+                          ? 'border-red-300 text-gray-700 hover:border-red-500'
+                          : 'border-gray-300 text-gray-700 hover:border-black'
                     } ${isOutOfStock ? 'cursor-not-allowed opacity-50' : ''}`}
                   >
                     {sizeObj.size}
@@ -258,14 +277,14 @@ export default function ProductDetail() {
           <div className="mt-10 flex flex-col items-center space-y-4 px-10">
             <button
               onClick={handleAddToCart}
-              className="w-full rounded-3xl bg-black px-6 py-4 text-white"
+              className="w-full rounded-3xl bg-black px-6 py-4 text-white transition-colors duration-200 hover:bg-gray-800"
             >
               Add to Bag
             </button>
 
             <button
               onClick={handleAddToWishlist}
-              className="flex w-full items-center justify-center rounded-3xl border border-gray-300 bg-white px-8 py-4 text-black"
+              className="flex w-full items-center justify-center rounded-3xl border border-gray-300 bg-white px-8 py-4 text-black hover:bg-gray-50"
             >
               <span className="mr-2">Favorite</span>
               <FaHeart className="text-bla" />
