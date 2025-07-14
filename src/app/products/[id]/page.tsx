@@ -24,6 +24,16 @@ export default function ProductDetail() {
   const [relatedProducts, setRelatedProducts] = useState<ProductType[]>([]);
   const [loadingRelated, setLoadingRelated] = useState(false);
   const [showSizeError, setShowSizeError] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [favoriteAdded, setFavoriteAdded] = useState(false);
+
+  // ตรวจสอบสถานะ favorite จาก localStorage
+  useEffect(() => {
+    if (product && typeof window !== 'undefined') {
+      const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+      setIsFavorited(favorites.includes(product.id));
+    }
+  }, [product]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -88,7 +98,6 @@ export default function ProductDetail() {
 
     if (!product) return;
 
-    // เพิ่มสินค้าเข้าตะกร้าผ่าน Context
     addToCart({
       id: product.id,
       name: product.name,
@@ -102,7 +111,28 @@ export default function ProductDetail() {
   };
 
   const handleAddToWishlist = () => {
-    console.log('Added to favorites');
+    if (!product) return;
+
+    // อ่าน favorites จาก localStorage
+    const currentFavorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+
+    if (!isFavorited) {
+      // เพิ่มเข้า favorites
+      const newFavorites = [...currentFavorites, product.id];
+      localStorage.setItem('favorites', JSON.stringify(newFavorites));
+      setIsFavorited(true);
+      setFavoriteAdded(true);
+      console.log('Added to favorites:', product.name);
+
+      // แสดง notification
+      setTimeout(() => setFavoriteAdded(false), 3000);
+    } else {
+      // ลบออกจาก favorites
+      const newFavorites = currentFavorites.filter((id: number | string) => String(id) !== String(product.id));
+      localStorage.setItem('favorites', JSON.stringify(newFavorites));
+      setIsFavorited(false);
+      console.log('Removed from favorites:', product.name);
+    }
   };
 
   const handlePrevImage = () => {
@@ -149,7 +179,7 @@ export default function ProductDetail() {
 
       {/* Add to Cart Success Notification */}
       {addedToCart && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-20">
+        <div className="fixed inset-0 z-50 flex items-start justify-end pt-15 pl-4">
           <div className="relative w-full max-w-md rounded-lg border border-gray-200 bg-white p-4 shadow-lg">
             <button
               onClick={() => setAddedToCart(false)}
@@ -169,9 +199,9 @@ export default function ProductDetail() {
                 />
               </div>
               <div>
-                <h3 className="text-lg font-medium text-green-600">Added to Cart!</h3>
+                <h3 className="text-lg font-medium text-green-600">Added to Cart</h3>
                 <p className="text-sm font-medium">{product.name}</p>
-                <p className="text-sm text-gray-600">{product.description}</p>
+                <p className="text-sm text-gray-500">{product.category?.name}</p>
                 <p className="text-sm">Size: {selectedSize}</p>
                 <p className="text-sm font-semibold">฿{product.net_price.toLocaleString()}</p>
               </div>
@@ -192,6 +222,69 @@ export default function ProductDetail() {
                 View Cart
               </Link>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add to Favorites Success Notification */}
+      {favoriteAdded && (
+        <div className="fixed top-10 right-4 z-50 w-full max-w-sm rounded-xl border border-gray-200 bg-white p-4 shadow-lg">
+          {/* ปุ่มปิด */}
+          <button
+            onClick={() => setFavoriteAdded(false)}
+            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="h-5 w-5"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* ข้อความสำเร็จ */}
+          <div className="mb-3 flex items-center space-x-2">
+            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
+              <span className="text-xs font-bold text-white">✓</span>
+            </div>
+            <p className="text-sm font-semibold text-black">Added to Favorites</p>
+          </div>
+
+          {/* รายละเอียดสินค้า */}
+          <div className="flex items-center space-x-4">
+            <div className="h-16 w-16 overflow-hidden rounded-lg bg-gray-100">
+              <Image
+                src={product.images?.[0]?.url || '/placeholder.svg'}
+                alt={product.name}
+                width={64}
+                height={64}
+                className="h-full w-full object-contain"
+              />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-black">{product.name}</p>
+              {product.category?.name && (
+                <p className="text-sm text-gray-500">{product.category.name}</p>
+              )}
+              <p className="text-sm font-medium text-black">
+                ฿{product.net_price.toLocaleString()}
+              </p>
+            </div>
+          </div>
+
+          {/* ปุ่ม */}
+          <div className="mt-4">
+            <Link
+              href="/favorites"
+              onClick={() => setFavoriteAdded(false)}
+              className="block w-full rounded-full bg-black py-2 text-center text-sm font-medium text-white hover:bg-gray-800"
+            >
+              View Favorites
+            </Link>
           </div>
         </div>
       )}
@@ -221,7 +314,7 @@ export default function ProductDetail() {
           </div>
 
           {/* Thumbnails */}
-          <div className="grid grid-cols-8 gap-2">
+          <div className="grid grid-cols-8 gap-0.5">
             {product.images.map((img, index) => (
               <div
                 key={index}
@@ -301,10 +394,14 @@ export default function ProductDetail() {
 
             <button
               onClick={handleAddToWishlist}
-              className="flex w-full items-center justify-center rounded-3xl border border-gray-300 bg-white px-8 py-4 text-black hover:bg-gray-50"
+              className={`flex w-full items-center justify-center rounded-3xl border px-8 py-4 transition-colors duration-200 ${
+                isFavorited
+                  ? 'border-red-500 bg-red-50 text-red-600 hover:bg-red-100'
+                  : 'border-gray-300 bg-white text-black hover:bg-gray-50'
+              }`}
             >
-              <span className="mr-2">Favorite</span>
-              <FaHeart className="text-black" />
+              <span className="mr-2">{isFavorited ? 'Favorited' : 'Add to Favorites'}</span>
+              <FaHeart className={isFavorited ? 'text-red-500' : 'text-black'} />
             </button>
           </div>
 

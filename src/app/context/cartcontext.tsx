@@ -1,9 +1,9 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export interface CartItem {
-  id: string; // Changed from number to string
+  id: string;
   name: string;
   price: number;
   image: string;
@@ -14,8 +14,8 @@ export interface CartItem {
 interface CartContextType {
   cartItems: CartItem[];
   addToCart: (item: Omit<CartItem, 'quantity'>) => void;
-  removeFromCart: (id: string, size: string) => void; // Changed from number to string
-  updateQuantity: (id: string, size: string, quantity: number) => void; // Changed from number to string
+  removeFromCart: (id: string, size: string) => void;
+  updateQuantity: (id: string, size: string, quantity: number) => void;
   clearCart: () => void;
   getTotalPrice: () => number;
   getTotalItems: () => number;
@@ -23,8 +23,39 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const CART_STORAGE_KEY = 'shopping_cart';
+
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load cart items from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const storedCart = localStorage.getItem(CART_STORAGE_KEY);
+        if (storedCart) {
+          const parsedCart = JSON.parse(storedCart);
+          setCartItems(parsedCart);
+        }
+      } catch (error) {
+        console.error('Error loading cart from localStorage:', error);
+      } finally {
+        setIsLoaded(true);
+      }
+    }
+  }, []);
+
+  // Save cart items to localStorage whenever cartItems changes
+  useEffect(() => {
+    if (isLoaded && typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+      } catch (error) {
+        console.error('Error saving cart to localStorage:', error);
+      }
+    }
+  }, [cartItems, isLoaded]);
 
   const addToCart = (item: Omit<CartItem, 'quantity'>) => {
     setCartItems((prev) => {

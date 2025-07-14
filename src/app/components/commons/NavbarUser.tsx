@@ -96,7 +96,7 @@ export default function NavbarUser() {
   const actionItems = [
     { id: 'contract', label: 'Contact us', type: 'link', route: '#' },
     { id: 'person', icon: <GoPerson className="h-6 w-6" />, type: 'link', route: '#' },
-    { id: 'heart', icon: <PiHeartFill className="h-6 w-6" />, type: 'link', route: '#' },
+    { id: 'heart', icon: <PiHeartFill className="h-6 w-6" />, type: 'link', route: '/favorites' },
   ];
 
   // รายการเมนูย่อยสำหรับแต่ละหมวดหมู่ พร้อมเส้นทางที่ถูกต้อง
